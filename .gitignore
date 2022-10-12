@@ -106,3 +106,4 @@ dist
 # Python Compiled
 *.pyc
 frontend/src/client
+db/

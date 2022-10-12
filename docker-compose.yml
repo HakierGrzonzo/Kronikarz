@@ -14,4 +14,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-  
+
+  db:
+    ports:
+      - "8001:8000"
+    image: surrealdb/surrealdb:latest
+    command: start --log trace --user root --pass root file:///db
+    volumes:
+      - "./db:/db"
