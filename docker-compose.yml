@@ -11,6 +11,8 @@ services:
   backend:
     ports: 
       - "8000:80"
+    environment:
+      - "DATABASE=db:8000"
     build:
       context: .
       dockerfile: Dockerfile.backend
