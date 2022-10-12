@@ -1,0 +1,13 @@
+FROM python:3.10-bullseye
+RUN apt update -y && apt upgrade -y
+EXPOSE 80
+
+RUN python3 -m pip install poetry
+WORKDIR /backend 
+COPY ./backend/poetry.lock ./backend/pyproject.toml ./
+RUN poetry config virtualenvs.in-project true --local
+RUN poetry install --no-dev
+COPY ./backend .
+ENV DATABASE=postgresql+asyncpg://postgres:postgres@db:5432/clipselect 
+ENTRYPOINT /backend/backend_runner.sh
+

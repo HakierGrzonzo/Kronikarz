@@ -1,0 +1,17 @@
+services:
+  frontend:
+    ports:
+      - "3000:80"
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    depends_on:
+      - backend
+
+  backend:
+    ports: 
+      - "8000:80"
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+  
