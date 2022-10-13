@@ -6,6 +6,6 @@ from .surreal_orm import get_db
 app = FastAPI()
 
 
-@app.get('/api/')
+@app.get("/api/")
 async def hello(db: HTTPClient = Depends(get_db)):
-    return await db.select_all('test')
+    return await db.select_all("test")
