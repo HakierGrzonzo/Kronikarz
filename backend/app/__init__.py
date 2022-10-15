@@ -1,11 +1,13 @@
-from fastapi import FastAPI
-from fastapi.params import Depends
-from surrealdb.clients.http import HTTPClient
+from fastapi import FastAPI, Depends
+
+from .surreal_orm import Session
 from .surreal_orm import get_db
+from .database import User
+
 
 app = FastAPI()
 
 
-@app.get("/api/")
-async def hello(db: HTTPClient = Depends(get_db)):
-    return await db.select_all("test")
+@app.get("/api/", response_model=User)
+async def hello(db: Session = Depends(get_db)) -> User:
+    return await db.User.create(email="foo")
