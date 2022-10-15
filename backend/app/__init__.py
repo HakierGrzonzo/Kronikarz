@@ -1,19 +1,36 @@
-from typing import List
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 
-from .surreal_orm import Session
-from .surreal_orm import get_db
-from .database import User
-
+from .users import (
+    UserRead,
+    UserCreate,
+    UserUpdate,
+    auth_backend,
+    fastapi_users,
+)
 
 app = FastAPI()
 
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/api/auth/jwt",
+    tags=["auth"],
+)
 
-@app.get("/api/", response_model=User)
-async def hello(db: Session = Depends(get_db)) -> User:
-    return await db.User.create(email="foo")
+# Swagger can't be bothered with the auth on a different path
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["openapi_workaround"],
+)
 
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/api/auth",
+    tags=["auth"],
+)
 
-@app.get("/api/find", response_model=List[User])
-async def find(name: str, db: Session = Depends(get_db)) -> List[User]:
-    return await db.User.select("email = {}", (name,))
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/api/users",
+    tags=["users"],
+)

@@ -3,6 +3,24 @@ from surrealdb.clients import HTTPClient
 from .utils import quote_param
 
 
+def get_surreal_id_fuckery_normalizer(table_name: str):
+    """
+    surrealdb.py wants object ids without the table identifier when calling,
+    but always returns them in the results
+
+    This function returns a function that strips out the table
+    identifier/prefix from id if it is present
+    """
+    prefix = table_name + ":"
+
+    def normalizer(id: str) -> str:
+        if id.startswith(prefix):
+            return id[len(prefix) :]
+        return id
+
+    return normalizer
+
+
 class Base:
     """
     Class used to gather all the instances of different tables
@@ -12,6 +30,11 @@ class Base:
         self.tables = {}
 
     def table(self, pydantic_class: Any):
+
+        id_normalizer = get_surreal_id_fuckery_normalizer(
+            pydantic_class.__name__
+        )
+
         class TableEntry(pydantic_class):
             id: str
 
@@ -36,7 +59,9 @@ class Base:
                 """Creates an object from kwargs with given id and stores it in
                 surrealdb"""
                 return TableEntry(
-                    **await self._client.create_one(self.__name, id, data)
+                    **await self._client.create_one(
+                        self.__name, id_normalizer(id), data
+                    )
                 )
 
             async def select(
@@ -60,21 +85,23 @@ class Base:
 
             async def select_all(self) -> List[TableEntry]:
                 """Returns all rows from the table"""
-                return list(
-                    TableEntry(**d)
-                    for d in await self._client.select_all(self.__name)
-                )
+                response = await self._client.select_all(self.__name)
+                return list(TableEntry(**d) for d in response)
 
             async def select_id(self, id: str) -> TableEntry:
                 """Selects a record with a given id"""
                 return TableEntry(
-                    **await self._client.select_one(self.__name, id)
+                    **await self._client.select_one(
+                        self.__name, id_normalizer(id)
+                    )
                 )
 
             async def replace(self, id: str, **new_data: Dict) -> TableEntry:
                 """Replaces all data with a given id with new id"""
                 return TableEntry(
-                    **await self._client.replace_one(self.__name, id, new_data)
+                    **await self._client.replace_one(
+                        self.__name, id_normalizer(id), new_data
+                    )
                 )
 
             async def patch(
@@ -83,13 +110,13 @@ class Base:
                 """Patches some fields with a given id, a partial replace"""
                 return TableEntry(
                     **await self._client.upsert_one(
-                        self.__name, id, fields_to_replace
+                        self.__name, id_normalizer(id), fields_to_replace
                     )
                 )
 
             async def delete(self, id: str):
                 """Deletes an item with a given id from the table"""
-                await self._client.delete_one(self.__name, id)
+                await self._client.delete_one(self.__name, id_normalizer(id))
 
         # When debuging tables show the appropriate name
         Table.__name__ = f"{pydantic_class.__name__}Table"
