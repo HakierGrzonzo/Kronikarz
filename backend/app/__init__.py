@@ -16,13 +16,6 @@ app.include_router(
     tags=["auth"],
 )
 
-# Swagger can't be bothered with the auth on a different path
-app.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth/jwt",
-    tags=["openapi_workaround"],
-)
-
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/api/auth",
