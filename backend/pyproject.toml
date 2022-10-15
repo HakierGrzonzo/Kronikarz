@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["Grzegorz Koperwas <admin@grzegorzkoperwas.site>"]
+license = "GPL"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.85.0"
+fastapi-users = "^10.1.5"
+surrealdb = {git = "https://github.com/surrealdb/surrealdb.py.git"}
+uvicorn = "^0.18.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

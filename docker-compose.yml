@@ -1,0 +1,26 @@
+services:
+  frontend:
+    ports:
+      - "3000:80"
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    depends_on:
+      - backend
+
+  backend:
+    ports: 
+      - "8000:80"
+    environment:
+      - "DATABASE=db:8000"
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+
+  db:
+    ports:
+      - "8001:8000"
+    image: surrealdb/surrealdb:latest
+    command: start --log trace --user root --pass root file:///db
+    volumes:
+      - "./db:/db"
