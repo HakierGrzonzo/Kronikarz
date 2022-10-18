@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from app.trees import get_tree_router
+
 from .users import (
     UserRead,
     UserCreate,
@@ -27,3 +29,5 @@ app.include_router(
     prefix="/api/users",
     tags=["users"],
 )
+
+app.include_router(get_tree_router(fastapi_users), prefix="/api/trees", tags=["data"])

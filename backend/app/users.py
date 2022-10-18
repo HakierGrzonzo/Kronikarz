@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import List, Optional, Dict
 from fastapi import Depends, Request
 from fastapi_users import schemas, BaseUserManager, FastAPIUsers
 from fastapi_users.db.base import BaseUserDatabase
@@ -7,23 +7,13 @@ from fastapi_users.authentication import (
     BearerTransport,
     JWTStrategy,
 )
-from pydantic import BaseModel
+from .tables import User
 
-from .surreal_orm import base, Session, get_db
-
-
-@base.table
-class User(BaseModel):
-    id: str
-    email: str
-    hashed_password: str
-    is_active: bool = True
-    is_superuser: bool = False
-    is_verified: bool = True
+from .surreal_orm import Session, get_db
 
 
 class UserRead(schemas.BaseUser):
-    pass
+    trees: List[str]
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -93,9 +83,7 @@ class UserManager(BaseUserManager[User, str]):
         self, user: User, token: str, _: Optional[Request] = None
     ):
         # TODO: Send verification token via email?
-        print(
-            f"Verification requested for user {user.id}. Verification token: {token}"
-        )
+        print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 
 async def get_user_manager(

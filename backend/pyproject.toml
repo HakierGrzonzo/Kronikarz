@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 fastapi = "^0.85.0"
 fastapi-users = "^10.1.5"
-surrealdb = {git = "https://github.com/surrealdb/surrealdb.py.git"}
+surrealdb = {git = "https://github.com/HakierGrzonzo/surrealdb.py.git"}
 uvicorn = "^0.18.3"
 
 [tool.poetry.group.dev.dependencies]

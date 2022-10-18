@@ -1,24 +1,12 @@
 from typing import Any, Dict, List, Tuple, Optional
 from surrealdb.clients import HTTPClient
-from .utils import quote_param
 
-
-def get_surreal_id_fuckery_normalizer(table_name: str):
-    """
-    surrealdb.py wants object ids without the table identifier when calling,
-    but always returns them in the results
-
-    This function returns a function that strips out the table
-    identifier/prefix from id if it is present
-    """
-    prefix = table_name + ":"
-
-    def normalizer(id: str) -> str:
-        if id.startswith(prefix):
-            return id[len(prefix) :]
-        return id
-
-    return normalizer
+from app.utils import debug
+from .utils import (
+    quote_param,
+    get_surreal_id_fuckery_normalizer,
+    change_data_to_relation,
+)
 
 
 class Base:
@@ -31,9 +19,7 @@ class Base:
 
     def table(self, pydantic_class: Any):
 
-        id_normalizer = get_surreal_id_fuckery_normalizer(
-            pydantic_class.__name__
-        )
+        id_normalizer = get_surreal_id_fuckery_normalizer(pydantic_class.__name__)
 
         class TableEntry(pydantic_class):
             id: str
@@ -52,7 +38,11 @@ class Base:
                 """Creates an object from kwargs with random id and stores it
                 in surrealdb"""
                 return TableEntry(
-                    **(await self._client.create_all(self.__name, data))[0]
+                    **(
+                        await self._client.create_all(
+                            self.__name, change_data_to_relation(data)
+                        )
+                    )[0]
                 )
 
             async def create_one(self, id: str, **data: Dict) -> TableEntry:
@@ -60,7 +50,7 @@ class Base:
                 surrealdb"""
                 return TableEntry(
                     **await self._client.create_one(
-                        self.__name, id_normalizer(id), data
+                        self.__name, id_normalizer(id), change_data_to_relation(data)
                     )
                 )
 
@@ -71,9 +61,7 @@ class Base:
                 if where_params is None:
                     where_params = tuple()
                 else:
-                    where_params = tuple(
-                        [quote_param(param) for param in where_params]
-                    )
+                    where_params = tuple([quote_param(param) for param in where_params])
                 return list(
                     TableEntry(**d)
                     for d in await self._client.execute(
@@ -83,6 +71,17 @@ class Base:
                     )
                 )
 
+            async def select_deep(
+                self, id: str, fields_to_fetch: List[str]
+            ) -> TableEntry:
+                """Returns an object with given id with all it's links loaded"""
+                result = await self._client.execute(
+                    f'SELECT * FROM {id} FETCH {",".join(fields_to_fetch)}'
+                )
+                if len(result) != 1:
+                    raise Exception("Failed to fetch by id!")
+                return TableEntry(**result[0])
+
             async def select_all(self) -> List[TableEntry]:
                 """Returns all rows from the table"""
                 response = await self._client.select_all(self.__name)
@@ -91,26 +90,26 @@ class Base:
             async def select_id(self, id: str) -> TableEntry:
                 """Selects a record with a given id"""
                 return TableEntry(
-                    **await self._client.select_one(
-                        self.__name, id_normalizer(id)
-                    )
+                    **await self._client.select_one(self.__name, id_normalizer(id))
                 )
 
             async def replace(self, id: str, **new_data: Dict) -> TableEntry:
                 """Replaces all data with a given id with new id"""
                 return TableEntry(
                     **await self._client.replace_one(
-                        self.__name, id_normalizer(id), new_data
+                        self.__name,
+                        id_normalizer(id),
+                        change_data_to_relation(new_data),
                     )
                 )
 
-            async def patch(
-                self, id: str, **fields_to_replace: Dict
-            ) -> TableEntry:
+            async def patch(self, id: str, **fields_to_replace: Dict) -> TableEntry:
                 """Patches some fields with a given id, a partial replace"""
                 return TableEntry(
                     **await self._client.upsert_one(
-                        self.__name, id_normalizer(id), fields_to_replace
+                        self.__name,
+                        id_normalizer(id),
+                        change_data_to_relation(fields_to_replace),
                     )
                 )
 
