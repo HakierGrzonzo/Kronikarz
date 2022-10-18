@@ -54,7 +54,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: hakiergrzonzo/pbl-backend
+          images: hakiergrzonzo/kornikarz-backend
           tags: |
             type=ref,event=branch
             type=ref,event=pr
