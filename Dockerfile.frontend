@@ -1,5 +1,5 @@
 FROM python:3.10 AS openapi
-
+RUN apt update -y && apt upgrade -y
 RUN python3 -m pip install poetry
 WORKDIR /backend 
 COPY ./backend/poetry.lock ./backend/pyproject.toml ./
