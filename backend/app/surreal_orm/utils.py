@@ -43,7 +43,7 @@ def change_data_to_relation(data: Dict) -> Dict:
             # Value is a primitive, can be passed directly
             return value
         elif isinstance(value, BaseModel):
-            return {k: check_data(v) for k, v in value.dict()}
+            return {k: check_data(v) for k, v in value.dict(by_alias=True)}
         elif isinstance(value, Dict):
             return {k: check_data(v) for k, v in value.items()}
         elif isinstance(value, Iterable):

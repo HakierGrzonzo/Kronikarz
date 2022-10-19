@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.node import get_node_router
 
 from app.trees import get_tree_router
 
@@ -31,3 +32,5 @@ app.include_router(
 )
 
 app.include_router(get_tree_router(fastapi_users), prefix="/api/trees", tags=["data"])
+
+app.include_router(get_node_router(fastapi_users), prefix="/api/nodes", tags=["data"])
