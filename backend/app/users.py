@@ -83,7 +83,9 @@ class UserManager(BaseUserManager[User, str]):
         self, user: User, token: str, _: Optional[Request] = None
     ):
         # TODO: Send verification token via email?
-        print(f"Verification requested for user {user.id}. Verification token: {token}")
+        print(
+            f"Verification requested for user {user.id}. Verification token: {token}"
+        )
 
 
 async def get_user_manager(

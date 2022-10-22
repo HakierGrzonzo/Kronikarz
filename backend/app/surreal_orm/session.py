@@ -13,6 +13,8 @@ class Session:
         self._client = client
         self._base = base
 
-    def __getattr__(self, __name: str) -> Union[TableInterface, RelationTableInterface]:
+    def __getattr__(
+        self, __name: str
+    ) -> Union[TableInterface, RelationTableInterface]:
         """Returns appropriate table as a property of this session"""
         return self._base.tables[__name](self._client)

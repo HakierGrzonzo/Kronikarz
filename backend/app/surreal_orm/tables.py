@@ -12,24 +12,41 @@ from .utils import (
 )
 
 T = TypeVar("T", covariant=True)
+R = TypeVar("R")
 
 
 class TableInterface(Protocol[T]):
+    """Defines all the operations a table should have"""
+
     async def create(self, **data: Dict) -> T:
         raise NotImplemented()
 
     async def select(
-        self, where_args: str, where_params: Optional[Tuple] = None
+        self,
+        where_args: str,
+        where_params: Optional[Tuple] = None,
+        fields_to_fetch: Optional[List[str]] = None,
     ) -> List[T]:
         raise NotImplemented()
 
     async def select_deep(self, id: str, fields_to_fetch: List[str]) -> T:
+        """
+        Record link relations need to be fetched explicitly, otherwise
+        they will be available only as strings.
+        """
         raise NotImplemented()
 
     async def select_all(self) -> List[T]:
         raise NotImplemented()
 
     async def select_id(self, id: str) -> T:
+        raise NotImplemented()
+
+    async def select_related(self, id: str, relation: type[R]) -> List[R]:
+        """
+        Selects all the outgoing edges and their targets that belong to a
+        given `relation` relation.
+        """
         raise NotImplemented()
 
     async def replace(self, id: str, **new_data: Dict) -> T:
@@ -47,6 +64,8 @@ T_out = TypeVar("T_out", covariant=True)
 
 
 class RelationTableInterface(Protocol[T, T_in, T_out]):
+    """Defines all the operations a relation table should have"""
+
     async def create(
         self,
         from_obj: Union[T_in, str],
@@ -56,21 +75,18 @@ class RelationTableInterface(Protocol[T, T_in, T_out]):
         raise NotImplemented()
 
     async def select(
-        self, where_args: str, where_params: Optional[Tuple] = None
+        self,
+        where_args: str,
+        where_params: Optional[Tuple] = None,
+        fields_to_fetch: Optional[List[str]] = None,
     ) -> List[T]:
         raise NotImplemented()
 
-    async def select_in(
-        self, where_args: str, where_params: Optional[Tuple] = None
-    ) -> List[T_in]:
-        raise NotImplemented()
-
-    async def select_out(
-        self, where_args: str, where_params: Optional[Tuple] = None
-    ) -> List[T_out]:
-        raise NotImplemented()
-
     async def select_deep(self, id: str, fields_to_fetch: List[str]) -> T:
+        """
+        Record link relations need to be fetched explicitly, otherwise
+        they will be available only as strings.
+        """
         raise NotImplemented()
 
     async def select_all(self) -> List[T]:
@@ -130,30 +146,53 @@ def get_table_class(
             )
 
         async def select(
-            self, where_args: str, where_params: Optional[Tuple] = None
+            self,
+            where_args: str,
+            where_params: Optional[Tuple] = None,
+            fields_to_fetch: Optional[List[str]] = None,
         ) -> List[TableEntry]:
             """Returns rows that match the where clause"""
             if where_params is None:
                 where_params = tuple()
             else:
-                where_params = tuple([quote_param(param) for param in where_params])
+                where_params = tuple(
+                    [quote_param(param) for param in where_params]
+                )
+            if fields_to_fetch is None:
+                fetch_statement = ""
+            else:
+                fetch_statement = f"FETCH {', '.join(fields_to_fetch)}"
             return list(
                 TableEntry(**d)
                 for d in await self._client.execute(
-                    f"SELECT * FROM {self.__name} WHERE {where_args}".format(
+                    f"SELECT * FROM {self.__name} WHERE {where_args} {fetch_statement}".format(
                         *where_params
                     )
                 )
             )
 
-        async def select_deep(self, id: str, fields_to_fetch: List[str]) -> TableEntry:
+        async def select_deep(
+            self, id: str, fields_to_fetch: List[str]
+        ) -> TableEntry:
             """Returns an object with given id with all it's links loaded"""
             result = await self._client.execute(
-                f'SELECT * FROM {id} FETCH {",".join(fields_to_fetch)}'
+                f'SELECT * FROM {quote_param(id)} FETCH {",".join(fields_to_fetch)}'
             )
             if len(result) != 1:
                 raise Exception("Failed to fetch by id!")
             return TableEntry(**result[0])
+
+        async def select_related(self, id: str, relation: type[R]) -> List[R]:
+            """Selects given relations (edges) that come out of the given
+            id"""
+            # quote item id, to hopefully prevent SQL injection
+            item_id = quote_param(f"{self.__name}:{id_normalizer(id)}")
+            result = await self._client.execute(
+                f"SELECT ->{relation.__name__}.* AS rel FROM {item_id} FETCH rel.out"
+            )
+            if len(result) != 1:
+                raise Exception("Failed to fetch by id!")
+            return list(relation(**x) for x in result[0]["rel"])
 
         async def select_all(self) -> List[TableEntry]:
             """Returns all rows from the table"""
@@ -190,7 +229,7 @@ def get_table_class(
             """Deletes an item with a given id from the table"""
             await self._client.delete_one(self.__name, id_normalizer(id))
 
-    # When debuging tables show the appropriate name
+    # When debugging tables show the appropriate name
     Table.__name__ = f"{pydantic_class.__name__}Table"
 
     return Table, TableEntry
@@ -219,11 +258,16 @@ def get_relation_class(
             to_obj: Union[to_class, str],
             **data: Dict,
         ) -> RelationEntry:
+            """Creates a relation using the `RELATE` statement"""
             res = await self._client.execute(
                 "RELATE {}->{}->{} CONTENT {}".format(
-                    from_obj if isinstance(from_obj, str) else from_obj.id,
+                    quote_param(
+                        from_obj if isinstance(from_obj, str) else from_obj.id
+                    ),
                     self.__name,
-                    to_obj if isinstance(to_obj, str) else to_obj.id,
+                    quote_param(
+                        to_obj if isinstance(to_obj, str) else to_obj.id
+                    ),
                     dumps(change_data_to_relation(data)),
                 ),
             )
@@ -231,5 +275,7 @@ def get_relation_class(
             if len(res) != 1:
                 raise Exception("Failed to create relation")
             return RelationEntry(**res[0])
+
+    RelationEntry.__name__ = pydantic_class.__name__
 
     return RelationTable, RelationEntry
