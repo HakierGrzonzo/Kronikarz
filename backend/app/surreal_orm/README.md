@@ -112,6 +112,8 @@ the `out` or `to` object/id. A look at the figure below might be helpful.
 
 ```
 [Person] from ---> in [Trip] out ---> to [CAR]
+
+-- Diagram of terminology used with graph edges
 ```
 
 As a result, the `create` operation requires those parameters.
@@ -147,4 +149,29 @@ async def select_driven_cars():
 
 `surreal_orm` will also add the following fields to your models:
 - `id: str` - id of the edge
-- `out: Relation[T]` - a string id or object  
+- `out: Relation[T]` - a string id or object that is a part of the graph edge
+- `in: Relation[T]` - a string id or object that is a part of the graph edge, also 
+aliased as `in_` as `in` is a python keyword
+
+## Caveats
+
+### SurrealDB ids
+
+```
+<table_name>:<item_id>
+
+-- Structure of SurrealDB ids
+```
+
+The `surreal.py` wrapper sometimes expects only the `item` part of the id to 
+be present. As a result `surrealORM` will attempt to strip the **table_name**
+part of the id automatically.
+
+A partial id, consisting only of an `item_id` will still work, but a full id is 
+preferred.
+
+
+### `base` and `Base`
+
+It is recommended to keep your schema definitions in one file. The ORM provides 
+a `base` object of class `Base` that is used to keep track of all table definitions.

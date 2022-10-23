@@ -474,9 +474,9 @@ speedups = []
 
 [package.source]
 type = "git"
-url = "https://github.com/HakierGrzonzo/surrealdb.py.git"
+url = "https://github.com/HakierGrzonzo/surrealdb.py"
 reference = "HEAD"
-resolved_reference = "6df7aaca2e49dafdd4982c9ea9260238bd627b62"
+resolved_reference = "5d05e47e277f4abdaeb265f5e3fe8f2229c088e6"
 
 [[package]]
 name = "tomli"
@@ -524,7 +524,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "196fadee68111980ba7427b7fa263b31835a889ce53cdb38873850a093734746"
+content-hash = "7760b81a89d572b76bcb2f3bcf8134a99c61a58a6bd7476353921e1861b2f4ff"
 
 [metadata.files]
 aiohttp = [

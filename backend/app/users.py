@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict
+from pydantic import Field
 from fastapi import Depends, Request
 from fastapi_users import schemas, BaseUserManager, FastAPIUsers
 from fastapi_users.db.base import BaseUserDatabase
@@ -13,7 +14,7 @@ from .surreal_orm import Session, get_db
 
 
 class UserRead(schemas.BaseUser):
-    trees: List[str]
+    trees: List[str] = Field(default_factory=lambda: list())
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -46,13 +47,18 @@ class SurrealUsersDatabase(BaseUserDatabase[User, str]):
             raise Exception(f"Many accounts with the same email <{email}>!")
 
     async def create(self, create_dict: Dict) -> User:
-        return await self._session.User.create(**create_dict)
+        res = await self._session.User.create(**create_dict, trees=[])
+        await self._session.commit()
+        return res 
 
     async def update(self, user: User, update_dict: Dict) -> User:
-        return await self._session.User.patch(user.id, **update_dict)
+        res = await self._session.User.patch(user.id, **update_dict)
+        await self._session.commit()
+        return res
 
     async def delete(self, user: User) -> None:
         await self._session.User.delete(user.id)
+        await self._session.commit()
 
 
 def get_user_db(session: Session = Depends(get_db)):

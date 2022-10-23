@@ -20,8 +20,9 @@ def get_tree_router(fastapi_users: FastAPIUsers) -> APIRouter:
         user: UserRead = Depends(fastapi_users.current_user()),
         session: Session = Depends(get_db),
     ):
-        tree = await session.Tree.create(name=name)
+        tree = await session.Tree.create(name=name, nodes=[])
         await session.User.patch(user.id, trees=[*user.trees, tree])
+        await session.commit()
         return tree
 
     @router.get("/my", response_model=List[Tree])

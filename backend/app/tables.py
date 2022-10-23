@@ -1,5 +1,5 @@
-from typing import Dict
-from pydantic import BaseModel, Field
+from typing import Dict, Optional
+from pydantic import BaseModel
 
 from .surreal_orm.relation import RelationList
 from .surreal_orm import base
@@ -19,7 +19,7 @@ class NodeRelation(BaseModel):
 @base.table
 class Tree(BaseModel):
     name: str
-    nodes: RelationList[Node] = Field(default_factory=lambda: list())
+    nodes: RelationList[Node]
 
 
 @base.table
@@ -30,4 +30,4 @@ class User(BaseModel):
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = True
-    trees: RelationList[Tree] = Field(default_factory=lambda: list())
+    trees: RelationList[Tree]
