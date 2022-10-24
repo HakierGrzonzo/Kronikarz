@@ -3,13 +3,11 @@ from typing import Any, Dict, Iterable
 from pydantic import BaseModel
 
 
-
-
 def change_data_to_relation(data: Dict) -> Dict:
     """
     Ensures that data is not duplicated and is instead related in the database
     """
-    
+
     def check_data(value: Any):
         """
         Recursively checks all fields for nested database entires and weird types

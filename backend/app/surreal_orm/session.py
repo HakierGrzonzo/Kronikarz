@@ -22,6 +22,5 @@ class Session:
 
     async def commit(self):
         """Commits the transaction"""
-        await self._client.query('COMMIT TRANSACTION')
+        await self._client.query("COMMIT TRANSACTION")
         self._commited = True
-        

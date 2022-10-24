@@ -8,7 +8,6 @@ from app.users import UserRead
 
 from .surreal_orm.session import Session
 from .tables import Node, NodeRelation
-from app.surreal_orm import session
 
 
 def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
@@ -30,6 +29,8 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         )
 
         await session.Tree.patch(tree.id, nodes=[*tree.nodes, node])
+
+        await session.commit()
 
         return node
 
@@ -53,12 +54,16 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         if in_node_id not in tree.nodes or out_node_id not in tree.nodes:
             raise HTTPException(400, "Nodes don't belong to the same tree")
 
-        return await session.NodeRelation.create(
+        res = await session.NodeRelation.create(
             in_node_id,
             out_node_id,
             props=edge_props,
             relation_type=relation_type,
         )
+
+        await session.commit()
+
+        return res
 
     @router.get(
         "/relations/{tree_id}/{node_id}", response_model=List[NodeRelation]

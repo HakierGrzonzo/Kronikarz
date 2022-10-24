@@ -107,7 +107,6 @@ class RelationTableInterface(Protocol[T, T_in, T_out]):
 def get_table_class(
     pydantic_class: type[BaseModel],
 ) -> Tuple[type[TableInterface], type[BaseModel]]:
-
     class TableEntry(pydantic_class):
         id: str
 
@@ -124,11 +123,9 @@ def get_table_class(
             """Creates an object from kwargs with random id and stores it
             in surrealdb"""
             result = await self._client.create(
-                        self.__name, change_data_to_relation(data)
-                    ) 
-            return TableEntry(
-                **result[0]
+                self.__name, change_data_to_relation(data)
             )
+            return TableEntry(**result[0])
 
         async def select(
             self,
@@ -148,14 +145,11 @@ def get_table_class(
             else:
                 fetch_statement = f"FETCH {', '.join(fields_to_fetch)}"
             result = await self._client.query(
-                    f"SELECT * FROM {self.__name} WHERE {where_args} {fetch_statement}".format(
-                        *where_params
-                    )
+                f"SELECT * FROM {self.__name} WHERE {where_args} {fetch_statement}".format(
+                    *where_params
                 )
-            return list(
-                TableEntry(**d)
-                for d in result[0]
             )
+            return list(TableEntry(**d) for d in result[0])
 
         async def select_deep(
             self, id: str, fields_to_fetch: List[str]
@@ -190,29 +184,23 @@ def get_table_class(
         async def select_id(self, id: str) -> TableEntry:
             """Selects a record with a given id"""
             res = await self._client.select(id)
-            return TableEntry(
-                **res[0]
-            )
+            return TableEntry(**res[0])
 
         async def replace(self, id: str, **new_data: Dict) -> TableEntry:
             """Replaces all data with a given id with new id"""
             res = await self._client.update(
-                    id,
-                    change_data_to_relation(new_data),
-                )
-            return TableEntry(
-                **res[0]
+                id,
+                change_data_to_relation(new_data),
             )
+            return TableEntry(**res[0])
 
         async def patch(self, id: str, **fields_to_replace: Dict) -> TableEntry:
             """Patches some fields with a given id, a partial replace"""
             res = await self._client.change(
-                    id,
-                    change_data_to_relation(fields_to_replace),
-                )
-            return TableEntry(
-                **res[0]
+                id,
+                change_data_to_relation(fields_to_replace),
             )
+            return TableEntry(**res[0])
 
         async def delete(self, id: str):
             """Deletes an item with a given id from the table"""

@@ -30,7 +30,7 @@ from surreal_orm import get_db
 
 async def create_example():
     # Create a session for the database operations
-    session = get_db()
+    session = await get_db()
 
     # properties are given as key word arguments. A table is selected 
     # as a attribiute of the session object.
@@ -40,6 +40,9 @@ async def create_example():
         "foo", 
         field="this record has the `foo` id"
     )
+
+    # Commit the transaction
+    await session.commit()
 ```
 
 ### `SELECT` statements:
@@ -49,7 +52,7 @@ from surreal_orm import get_db
 
 async def select_example():
     # Create a session for the database operations
-    session = get_db()
+    session = await get_db()
 
     all_examples = await session.Example.select_all()
     
@@ -120,7 +123,7 @@ As a result, the `create` operation requires those parameters.
 
 ```python
 async def create_relation():
-    session = get_db()
+    session = await get_db()
 
     # let `chad` be a person with a random id
     chad = await session.Person.create(name="Chad")
@@ -131,6 +134,8 @@ async def create_relation():
     # chad drove the miata for 5 football fields, 
     # you can pass full objects or raw ids to the function
     trip = await session.Trip.create(chad, 'Car:miata', distance=5)
+
+    await session.commit()
 ```
 
 You can also query all the relations that come out from a given object using the
@@ -155,21 +160,9 @@ aliased as `in_` as `in` is a python keyword
 
 ## Caveats
 
-### SurrealDB ids
+### Transactions:
 
-```
-<table_name>:<item_id>
-
--- Structure of SurrealDB ids
-```
-
-The `surreal.py` wrapper sometimes expects only the `item` part of the id to 
-be present. As a result `surrealORM` will attempt to strip the **table_name**
-part of the id automatically.
-
-A partial id, consisting only of an `item_id` will still work, but a full id is 
-preferred.
-
+Transactions are currently broken and do not rollback the data.
 
 ### `base` and `Base`
 

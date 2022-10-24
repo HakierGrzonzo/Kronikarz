@@ -49,7 +49,7 @@ class SurrealUsersDatabase(BaseUserDatabase[User, str]):
     async def create(self, create_dict: Dict) -> User:
         res = await self._session.User.create(**create_dict, trees=[])
         await self._session.commit()
-        return res 
+        return res
 
     async def update(self, user: User, update_dict: Dict) -> User:
         res = await self._session.User.patch(user.id, **update_dict)

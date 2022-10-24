@@ -8,14 +8,16 @@ from .session import Session
 async def get_db() -> AsyncGenerator[Session, None]:
     async with WebsocketClient(
         f"http://{environ.get('DATABASE', 'localhost:8001')}/rpc",
-    ) as client: 
-        await client.signin({
-            'user': 'root',
-            'pass': 'root',
-        })
+    ) as client:
+        await client.signin(
+            {
+                "user": "root",
+                "pass": "root",
+            }
+        )
         # Specify the namespace and the database
-        await client.use('test', 'test')
-        await client.query('BEGIN TRANSACTION;')
+        await client.use("test", "test")
+        await client.query("BEGIN TRANSACTION;")
 
         # Create a database session and do stuff
         session = Session(client, base)
@@ -23,7 +25,4 @@ async def get_db() -> AsyncGenerator[Session, None]:
 
         # If we did not commit the data, cancel the transaction
         if not session._commited:
-            await client.query('CANCEL TRANSACTION;')
-
-
-
+            await client.query("CANCEL TRANSACTION;")

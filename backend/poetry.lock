@@ -476,7 +476,7 @@ speedups = []
 type = "git"
 url = "https://github.com/HakierGrzonzo/surrealdb.py"
 reference = "HEAD"
-resolved_reference = "5d05e47e277f4abdaeb265f5e3fe8f2229c088e6"
+resolved_reference = "60d80006f1033ebc7735f2ebe7f59a9de6fdbfe6"
 
 [[package]]
 name = "tomli"
