@@ -11,6 +11,7 @@ A project for Software Engineering course at Silesian University of Technology
 - `docker` and `docker-compose`
 - `make`
 - `bash`
+- `pandoc` and `latex` for compiling presentations
 
 ## Basic operations:
 
@@ -48,3 +49,10 @@ directory. It is a separate python module. Look at its readme for details.
 We use SurrealDB with docker as our database.
 
 You can use the `make nuke_db` command to drop the database.
+
+### Docs:
+
+Most docs are located in the `./docs` directory. Some docs can be compiled into
+beamer presentations.
+
+- Efekt 2 - `make efekt2`
