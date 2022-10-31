@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+from app.node import get_node_router
+
+from app.trees import get_tree_router
 
 from .users import (
     UserRead,
@@ -27,3 +31,18 @@ app.include_router(
     prefix="/api/users",
     tags=["users"],
 )
+
+app.include_router(
+    get_tree_router(fastapi_users), prefix="/api/trees", tags=["data"]
+)
+
+app.include_router(
+    get_node_router(fastapi_users), prefix="/api/nodes", tags=["data"]
+)
+
+
+@app.get("/", response_class=RedirectResponse)
+def redirect_to_docs():
+    """Redirects the developer to the docs, if they forget to add `/docs` to
+    the url."""
+    return RedirectResponse("/docs")
