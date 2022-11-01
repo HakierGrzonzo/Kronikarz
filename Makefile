@@ -28,4 +28,5 @@ nuke_db:
 prod:
 	docker-compose up --build
 
-
+efekt2: docs/uwarunkowania.md
+	./.scripts/make_presentation.sh docs/uwarunkowania.md docs/uwarunkowania.pdf
