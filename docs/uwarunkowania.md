@@ -22,11 +22,25 @@ section-titles: false
 Postanowiliśmy przeanalizować trzy inne rozwiązanie, które podchodzą do problemu 
 drzew genealogicznych w trzy różne sposoby.
 
-## [Mackiev Family Tree Maker 2019](https://www.mackiev.com/ftm/):
+## [Mackiev Family Tree Maker 2019](https://www.mackiev.com/ftm/)
+
+::: columns
+
+:::: column
 
 **Family Tree Maker 2019** jest klasyczną aplikacją natywną. Sprawia wrażenie 
 produktu profesjonalnego, nie skierowanego do małych rodzinnych zastosowań, 
 wydaje się bardziej skierowana dla osób, dla których genealogia jest zawodem.
+
+::::
+
+:::: column
+
+![Grafika promocyjna FTM2019](https://www.mackiev.com/images/ftm/product_page/intro_1x.png?v3)
+
+::::
+
+:::
 
 ### Zalety oraz wady
 
@@ -42,7 +56,11 @@ wydaje się bardziej skierowana dla osób, dla których genealogia jest zawodem.
   - Duży koszt (80 funtów → 439zł!)
   - Brak wsparcia dla systemu GNU/Linux
 
-## [Lucidchart](https://www.lucidchart.com/pages/examples/family-tree-generator):
+## [Lucidchart](https://www.lucidchart.com/pages/examples/family-tree-generator)
+
+::: columns
+
+:::: column
 
 **Lucidchart** jest produktem skierowanym tylko i wyłącznie dla małych drzew 
 rodzinnych, nie zawiera jakiejkolwiek funkcjonalności mającej na celu działanie 
@@ -50,6 +68,16 @@ na danych, skupia się wyłącznie na ich prezentacji.
 
 **Lucidchart** jest bardziej klonem *graph.io*, aniżeli pełnoprawną aplikacją do 
 tworzenia drzew genealogicznych.
+
+::::
+
+:::: column
+
+![Interfejs lucidchart](https://cdn-cashy-static-assets.lucidchart.com/marketing/pages/consideration-page/Tree-Chart/_new_family-tree-chart-track-history.png){width=250px}
+
+::::
+
+:::
 
 ### Zalety oraz wady
 
@@ -67,9 +95,23 @@ tworzenia drzew genealogicznych.
 
 ## [Ancestry.com](https://www.ancestry.com/c/family-tree)
 
+::: columns
+
+:::: column
+
 **Ancestry.com** jest produktem głównie skierowanym dla klientów serwisu badań 
 genetycznych swojego producenta. Cechą szczególną tego rozwiązania jest możliwość 
 wyszukiwania danych w wielu najróżniejszych źródłach.
+
+::::
+
+:::: column
+
+![Interfejs Ancestry.com](./docs/assets/ancestry.png)
+
+::::
+
+:::
 
 ### Zalety oraz wady
 
