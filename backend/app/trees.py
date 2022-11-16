@@ -42,4 +42,17 @@ def get_tree_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
         return await session.Tree.select_deep(tree_id, ["nodes"])
 
+    @router.post("/delete", )
+    async def delete_tree(
+        tree_id: str,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        session: Session = Depends(get_db),
+    ):
+        """Moj pierwszy endpoint 8)"""
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+        await session.User.patch(current_user.id, trees=[tree for tree in current_user.trees if tree != tree_id])
+        await session.Tree.delete(tree_id)
+
     return router
+
