@@ -8,13 +8,19 @@ import { Box } from "@mui/system";
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
+import { createApiClient } from "~/createApiClient";
 
 export const action: ActionFunction = async ({ request }) => {
+  const api = createApiClient();
   const formData = await request.formData();
   try {
+    const resp = await api.auth.authJwtLoginApiAuthJwtLoginPost({
+      username: formData.get("email") as string,
+      password: formData.get("password") as string,
+    });
     return redirect("/home", {
       headers: {
-        "Set-Cookie": `auth=${formData.get("password")}`,
+        "Set-Cookie": `token=${resp.access_token}`,
       },
     });
   } catch {
@@ -37,7 +43,7 @@ export default function Login() {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          backgroundImage: "url(https://raw.githubusercontent.com/HakierGrzonzo/Kronikarz/29-ekran-logowania/frontend/public/background.png)",
+          backgroundImage: "url(/background.png)",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundSize: "contain",

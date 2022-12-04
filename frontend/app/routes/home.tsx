@@ -11,24 +11,34 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatches } from "@remix-run/react";
 import { useState } from "react";
+import { createApiClient } from "~/createApiClient";
 
 
 export const loader: LoaderFunction = async ({ request }) => {
-  console.log("loader");
-  return json({ msg: "Hello from loader" });
+  const cookies = request.headers.get("Cookie")?.split(";");
+  if (!cookies) {
+    throw redirect("/login");
+  }
+  const token = cookies?.find((c) => c.trim().startsWith("token="))?.split("=")[1]
+  if (!token) {
+    throw redirect("/login");
+  }
+  const api = createApiClient(token);
+  const resp = await api.users.usersCurrentUserApiUsersMeGet()
+  return json(resp);
 };
 
 const routes: { name: string; to: string }[] = [
   { name: "Dashboard", to: "/home" },
-  { name: "logout", to: "/login" },
+  { name: "Logout", to: "/login" },
 ];
 
 export default function Index() {
-  // const { user } = useLoaderData();
-  const user = { name: "test" };
+  const user = useLoaderData();
   const theme = useTheme();
   const matches = useMatches();
   const matchCandidate = matches
@@ -72,7 +82,7 @@ export default function Index() {
           <Typography variant="h6">
             {routes.find((r) => matchCandidate?.pathname === r.to)?.name}
           </Typography>
-          <Typography>Welcome back {user.name}</Typography>
+          <Typography>Welcome back {user.email}</Typography>
         </Toolbar>
       </AppBar>
       <Box
@@ -116,8 +126,9 @@ export default function Index() {
           </List>
           <Box sx={{ padding: 1, width: "5cm" }}>
             <img
-              src="https://raw.githubusercontent.com/HakierGrzonzo/Kronikarz/29-ekran-logowania/frontend/public/logo.png"
+              src="/logo.png"
               style={{ width: "100%" }}
+              alt="Kronikarz logo"
             />
           </Box>
         </Box>
