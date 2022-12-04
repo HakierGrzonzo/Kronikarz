@@ -113,3 +113,6 @@ docs/*.pdf
 
 # PyCharm
 .idea/
+
+# VSCode
+.vscode/
