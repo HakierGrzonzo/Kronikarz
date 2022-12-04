@@ -4,7 +4,10 @@
   "scripts": {
     "build": "remix build",
     "dev": "remix dev",
-    "start": "remix-serve build"
+    "start": "remix-serve build",
+    "openapi": "openapi --input http://localhost:8000/openapi.json --output ./src/client --client fetch --name AppClient",
+    "openprod": "openapi --input ./openapi.json --output ./src/client --client fetch --name AppClient",
+    "pre-commit": "prettier -w ."
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
