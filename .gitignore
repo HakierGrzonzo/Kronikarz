@@ -110,3 +110,6 @@ db/
 
 # Presentations:
 docs/*.pdf
+
+# PyCharm
+.idea/
