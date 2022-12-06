@@ -34,6 +34,6 @@ CMD /usr/sbin/nginx && tail -f /dev/null
 # let's copy the build
 RUN mkdir /www
 COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /frontend/dist/public /www/
+COPY --from=builder /frontend/public /www/
 
 
