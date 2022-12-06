@@ -11,8 +11,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import type { LoaderFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatches } from "@remix-run/react";
 import { useState } from "react";
 import { createApiClient } from "~/createApiClient";
@@ -28,8 +27,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  const resp = await api.users.usersCurrentUserApiUsersMeGet()
-  return json(resp);
+  const user = await api.users.usersCurrentUserApiUsersMeGet()
+  return json(user);
 };
 
 const routes: { name: string; to: string }[] = [

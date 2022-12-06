@@ -26,7 +26,7 @@ export default function App() {
         main: "#888798",
       },
       background: {
-        default: "#E0EDF2",
+        default: "#E0EEED",
       },
     },
   });
