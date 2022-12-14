@@ -16,18 +16,19 @@ import { Link, Outlet, useLoaderData, useMatches } from "@remix-run/react";
 import { useState } from "react";
 import { createApiClient } from "~/createApiClient";
 
-
 export const loader: LoaderFunction = async ({ request }) => {
   const cookies = request.headers.get("Cookie")?.split(";");
   if (!cookies) {
     throw redirect("/login");
   }
-  const token = cookies?.find((c) => c.trim().startsWith("token="))?.split("=")[1]
+  const token = cookies
+    ?.find((c) => c.trim().startsWith("token="))
+    ?.split("=")[1];
   if (!token) {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  const user = await api.users.usersCurrentUserApiUsersMeGet()
+  const user = await api.users.usersCurrentUserApiUsersMeGet();
   return json(user);
 };
 
@@ -138,20 +139,39 @@ export default function Index() {
             margin: 1,
           }}
         >
-          <Box sx={{
-            overflowY: "auto",
-            overflowX: "hidden",
-            height: "calc(100vh - 64px - 16px - 1cm)"
-          }}>
+          <Box
+            sx={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              height: "calc(100vh - 64px - 16px - 1cm)",
+            }}
+          >
             <Outlet />
           </Box>
-          <Box sx={{ height: '1cm', display: 'flex', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              height: "1cm",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <Typography variant="caption">
-              <Link to="/support" style={{ color: theme.palette.grey[600] }}>Support</Link>{" "}
-              <a href="https://github.com/HakierGrzonzo/kronikarz" style={{ color: theme.palette.grey[600] }}>Github</a>
+              <Link to="/support" style={{ color: theme.palette.grey[600] }}>
+                Support
+              </Link>{" "}
+              <a
+                href="https://github.com/HakierGrzonzo/kronikarz"
+                style={{ color: theme.palette.grey[600] }}
+              >
+                Github
+              </a>
             </Typography>
-            <Typography variant="caption" color={theme.palette.grey[600]}><strong>NOT FOR COMMERCIAL USE</strong></Typography>
-            <Typography variant="caption" color={theme.palette.grey[600]}>Copyright 2022</Typography>
+            <Typography variant="caption" color={theme.palette.grey[600]}>
+              <strong>NOT FOR COMMERCIAL USE</strong>
+            </Typography>
+            <Typography variant="caption" color={theme.palette.grey[600]}>
+              Copyright 2022
+            </Typography>
           </Box>
         </Box>
       </Box>

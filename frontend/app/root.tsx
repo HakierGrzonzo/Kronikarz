@@ -1,4 +1,12 @@
-import { Alert, AlertTitle, Box, createTheme, CssBaseline, ThemeProvider, Typography } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  Typography,
+} from "@mui/material";
 import type { MetaFunction } from "@remix-run/node";
 import {
   Links,
@@ -32,7 +40,7 @@ export default function App() {
   });
 
   return (
-    <html lang="en" >
+    <html lang="en">
       <head>
         <Meta />
         <Links />
@@ -50,19 +58,21 @@ export default function App() {
         <Scripts />
         <LiveReload />
       </body>
-    </html >
+    </html>
   );
 }
 
 export function CatchBoundary() {
   return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      height: '100vh',
-      width: '100vw',
-      justifyContent: 'center'
-    }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
+        justifyContent: "center",
+      }}
+    >
       <Alert severity="error" sx={{ width: "15cm" }}>
         <AlertTitle>You don't have permission to access this page!</AlertTitle>
         <Typography variant="body1">
@@ -71,5 +81,5 @@ export function CatchBoundary() {
         </Typography>
       </Alert>
     </Box>
-  )
+  );
 }
