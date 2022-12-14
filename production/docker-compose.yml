@@ -1,0 +1,20 @@
+services:
+  frontend:
+    ports:
+      - "3000:80"
+    image: hakiergrzonzo/kronikarz-frontend:main
+    depends_on:
+      - backend
+
+  backend:
+    environment:
+      - "DATABASE=db:8000"
+    image: hakiergrzonzo/kornikarz-backend:main
+
+  db:
+    ports:
+      - "8001:8000"
+    image: surrealdb/surrealdb:latest
+    command: start --log trace --user root --pass root file:///db
+    volumes:
+      - "/home/glusterfs/kronikarz/db:/db"
