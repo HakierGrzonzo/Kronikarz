@@ -1,29 +1,42 @@
 {
-  "name": "frontend",
+  "private": true,
+  "sideEffects": false,
   "scripts": {
-    "dev": "solid-start dev",
-    "build": "solid-start build",
-    "start": "solid-start start",
-    "openapi": "openapi --input http://localhost:8000/openapi.json --output ./src/client --client fetch --name AppClient",
-    "openprod": "openapi --input ./openapi.json --output ./src/client --client fetch --name AppClient",
+    "build": "remix build",
+    "dev": "remix dev",
+    "start": "remix-serve build",
+    "openapi": "openapi --input http://localhost:8000/openapi.json --output ./app/client --client fetch --name AppClient",
+    "openprod": "openapi --input ./openapi.json --output ./app/client --client fetch --name AppClient",
     "pre-commit": "prettier -w ."
   },
-  "type": "module",
-  "devDependencies": {
-    "openapi-typescript-codegen": "^0.23.0",
-    "solid-start-node": "^0.1.0",
-    "typescript": "^4.8.3",
-    "vite": "^3.1.0"
-  },
   "dependencies": {
-    "@solidjs/meta": "^0.28.0",
-    "@solidjs/router": "^0.4.3",
-    "prettier": "^2.7.1",
-    "solid-js": "^1.5.7",
-    "solid-start": "^0.1.0",
-    "undici": "^5.10.0"
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.10.15",
+    "@mui/material": "^5.10.15",
+    "@mui/x-data-grid": "^5.17.13",
+    "@remix-run/node": "^1.7.6",
+    "@remix-run/react": "^1.7.6",
+    "@remix-run/serve": "^1.7.6",
+    "date-fns": "^2.29.3",
+    "highcharts": "^10.3.1",
+    "highcharts-react-official": "^3.1.0",
+    "isbot": "^3.6.5",
+    "pocketbase": "^0.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^1.7.6",
+    "@remix-run/eslint-config": "^1.7.6",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.8",
+    "eslint": "^8.27.0",
+    "openapi-typescript-codegen": "^0.23.0",
+    "prettier": "^2.8.0",
+    "typescript": "^4.8.4"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=14"
   }
 }

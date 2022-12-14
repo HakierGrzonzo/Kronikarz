@@ -1,11 +1,9 @@
+node_modules
 
-dist
-.solid
-.output
-.vercel
-.netlify
-netlify
-
+/.cache
+/build
+/public/build
+.env
 # dependencies
 /node_modules
 
@@ -22,3 +20,6 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+
+# openapi
+/app/client

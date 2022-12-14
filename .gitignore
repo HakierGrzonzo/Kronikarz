@@ -110,3 +110,9 @@ db/
 
 # Presentations:
 docs/*.pdf
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
