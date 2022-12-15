@@ -84,3 +84,22 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  deployment:
+    runs-on: ubuntu-latest
+    environment: production
+    needs:
+      - backend
+      - frontend
+    steps:
+      - name: pull
+        uses: HakierGrzonzo/ssh-pipeline@master
+        with:
+          host: ${{ secrets.PROD_IP }}
+          user: ${{ secrets.PROD_USER }}
+          port: ${{ secrets.PROD_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.PROD_USER }}/Kronikarz/production
+            docker-compose pull
+            docker-compose down 
+            docker-compose up -d
