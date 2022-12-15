@@ -86,12 +86,14 @@ jobs:
 
   deployment:
     runs-on: ubuntu-latest
-    environment: production
+    environment: 
+      name: production
+      url: https://dev.grzegorzkoperwas.site
     needs:
       - backend
       - frontend
     steps:
-      - name: pull
+      - name: Deploy to XeonServ
         uses: HakierGrzonzo/ssh-pipeline@master
         with:
           host: ${{ secrets.PROD_IP }}
