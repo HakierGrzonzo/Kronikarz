@@ -85,6 +85,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   deployment:
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
     environment: 
       name: production
@@ -105,3 +106,4 @@ jobs:
             docker-compose pull
             docker-compose down 
             docker-compose up -d
+            fortune /usr/share/fortune/pony
