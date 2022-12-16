@@ -2,6 +2,8 @@ services:
   frontend:
     ports:
       - "3000:3000"
+    environment:
+      - "BACKEND=http://backend"
     build:
       context: .
       dockerfile: Dockerfile.frontend

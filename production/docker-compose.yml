@@ -3,6 +3,8 @@ services:
     ports:
       - "3000:3000"
     image: hakiergrzonzo/kronikarz-frontend:main
+    environment:
+      - "BACKEND=http://backend"
     depends_on:
       - backend
 
@@ -12,8 +14,6 @@ services:
     image: hakiergrzonzo/kornikarz-backend:main
 
   db:
-    ports:
-      - "8001:8000"
     image: surrealdb/surrealdb:latest
     command: start --log trace --user root --pass root file:///db
     volumes:
