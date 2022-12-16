@@ -1,0 +1,30 @@
+name: Check code formatting
+
+on: [pull_request]
+
+jobs:
+  checkBackend:
+    runs-on: ubuntu-latest
+    name: Check backend code formatting
+    steps:
+      - uses: actions/checkout@v3
+      - uses: piotrpawlaczek/python-blacken@release/stable
+        name: Blacken code
+        with: 
+          line-length: '80'
+          path: './backend/app'
+          only-check: 'yes'
+
+  checkFrontend:
+    runs-on: ubuntu-latest
+    name: Check frontend code formatting
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.2
+        with:
+          dry: True
+
+

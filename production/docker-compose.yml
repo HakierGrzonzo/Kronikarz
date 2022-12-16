@@ -2,27 +2,19 @@ services:
   frontend:
     ports:
       - "3000:3000"
+    image: hakiergrzonzo/kronikarz-frontend:main
     environment:
       - "BACKEND=http://backend"
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
     depends_on:
       - backend
 
   backend:
-    ports: 
-      - "8000:80"
     environment:
       - "DATABASE=db:8000"
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
+    image: hakiergrzonzo/kornikarz-backend:main
 
   db:
-    ports:
-      - "8001:8000"
     image: surrealdb/surrealdb:latest
     command: start --log trace --user root --pass root file:///db
     volumes:
-      - "./db:/db"
+      - "/home/glusterfs/kronikarz/db:/db"

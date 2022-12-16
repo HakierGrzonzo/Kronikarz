@@ -84,3 +84,26 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  deployment:
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://dev.grzegorzkoperwas.site
+    needs:
+      - backend
+      - frontend
+    steps:
+      - name: Deploy to XeonServ
+        uses: HakierGrzonzo/ssh-pipeline@master
+        with:
+          host: ${{ secrets.PROD_IP }}
+          user: ${{ secrets.PROD_USER }}
+          port: ${{ secrets.PROD_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.PROD_USER }}/Kronikarz/production
+            docker-compose pull
+            docker-compose down 
+            docker-compose up -d
+            fortune /usr/share/fortune/pony
