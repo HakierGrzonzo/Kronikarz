@@ -106,7 +106,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "nie ma takiego liścia")
+            raise HTTPException(400, "there is no such node")
 
         return await session.Node.select_id(node_id)
 
@@ -119,12 +119,12 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         current_user: UserRead = Depends(fastapi_users.current_user()),
         session: Session = Depends(get_db),
     ):
-        "Kasowanie liscia"
+        "Deleting node"
         if tree_id not in current_user.trees:
             raise HTTPException(403)
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "nie ma takiego liścia")    
+            raise HTTPException(400, "there is no such node")    
         await asyncio.gather(
             session.User.patch(
                 current_user.id,
@@ -132,5 +132,26 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             ),
             session.Node.delete(node_id),
         )
+    
+    @router.post(
+        "/{tree_id}/{node_id}/edit",
+    )
+    async def edit_node(
+        tree_id: str,
+        node_id: str,
+        new_props:Dict,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        session: Session = Depends(get_db),
+    ):
+        "Editing node"
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+        tree = await session.Tree.select_id(tree_id)
+        if node_id not in tree.nodes:
+            raise HTTPException(400, "there is no such node")
+        node = await session.Node.patch(node_id, props=new_props)
+        await session.commit()
+        return node
 
+        
     return router
