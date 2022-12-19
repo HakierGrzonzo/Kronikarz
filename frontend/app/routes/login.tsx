@@ -42,7 +42,6 @@ export default function Login() {
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundSize: "contain",
-          backgroundColor: "#e0edf2",
         }}
       >
         <Form method="post">
@@ -52,6 +51,7 @@ export default function Login() {
               flexDirection: "row",
               justifyContent: "space-evenly",
               alignItems: "center",
+              gap: 1,
               width: "60vw",
               marginTop: "500px",
               marginLeft: "26px",
