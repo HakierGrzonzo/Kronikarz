@@ -1,9 +1,16 @@
-import { Alert, Button, TextField, CircularProgress } from "@mui/material";
+import {
+  Alert,
+  Button,
+  TextField,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
+import { getCookieToDelete } from "~/utils/cookieUtils";
 
 export const action: ActionFunction = async ({ request }) => {
   const api = createApiClient();
@@ -13,10 +20,13 @@ export const action: ActionFunction = async ({ request }) => {
       username: formData.get("email") as string,
       password: formData.get("password") as string,
     });
+    const cookies = [getCookieToDelete("isFirstTime"), `token=${resp.access_token}`];
+    const headers = cookies.reduce((headers, curr) => {
+      headers.append("Set-Cookie", curr);
+      return headers;
+    }, new Headers());
     return redirect("/home", {
-      headers: {
-        "Set-Cookie": `token=${resp.access_token}`,
-      },
+      headers
     });
   } catch {
     return json({ msg: "Wrong email or password" });
@@ -45,6 +55,9 @@ export default function Login() {
         }}
       >
         <Form method="post">
+          <Typography variant="h2" sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}>
+            Please Login:
+          </Typography>
           <Box
             sx={{
               display: "flex",
@@ -53,11 +66,9 @@ export default function Login() {
               alignItems: "center",
               gap: 1,
               width: "60vw",
-              marginTop: "500px",
               marginLeft: "26px",
             }}
           >
-            {actionMsg && <Alert severity="error">{actionMsg.msg}</Alert>}
             {transition.state !== "submitting" ? (
               <>
                 <TextField name="email" type="email" id="email" label="email" />
@@ -87,7 +98,8 @@ export default function Login() {
               display: "flex",
               justifyContent: "center",
               width: "60vw",
-              marginTop: "50px",
+              marginTop: "30px",
+              marginBottom: "20px",
               marginLeft: "26px",
             }}
           >
@@ -99,6 +111,7 @@ export default function Login() {
               Submit
             </Button>
           </Box>
+          {actionMsg && <Alert severity="error">{actionMsg.msg}</Alert>}
         </Form>
       </Box>
     </>

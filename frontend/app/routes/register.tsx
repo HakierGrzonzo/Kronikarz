@@ -52,7 +52,7 @@ export default function Login() {
         }}
       >
         <Form method="post">
-          <Typography variant="h2" sx={{ margin: "535px 0 25px 26px", textAlign: "center" }}>
+          <Typography variant="h2" sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}>
             Please Register:
           </Typography>
           <Box
@@ -94,7 +94,7 @@ export default function Login() {
               display: "flex",
               justifyContent: "center",
               width: "60vw",
-              marginTop: "50px",
+              marginTop: "30px",
               marginBottom: "20px",
               marginLeft: "26px",
             }}
