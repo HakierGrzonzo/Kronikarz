@@ -124,7 +124,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "there is no such node")    
+            raise HTTPException(400, "there is no such node")
         await asyncio.gather(
             session.User.patch(
                 current_user.id,
@@ -132,14 +132,14 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             ),
             session.Node.delete(node_id),
         )
-    
+
     @router.post(
         "/{tree_id}/{node_id}/edit",
     )
     async def edit_node(
         tree_id: str,
         node_id: str,
-        new_props:Dict,
+        new_props: Dict,
         current_user: UserRead = Depends(fastapi_users.current_user()),
         session: Session = Depends(get_db),
     ):
@@ -153,5 +153,4 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         await session.commit()
         return node
 
-        
     return router
