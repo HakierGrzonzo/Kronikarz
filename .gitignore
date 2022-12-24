@@ -107,6 +107,7 @@ dist
 *.pyc
 frontend/src/client
 db/
+data/
 
 # Presentations:
 docs/*.pdf

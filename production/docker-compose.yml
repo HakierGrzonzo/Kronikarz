@@ -11,6 +11,7 @@ services:
   backend:
     environment:
       - "DATABASE=db:8000"
+      - "MINIO_HOSTNAME=minio:9000"
     image: hakiergrzonzo/kornikarz-backend:main
 
   db:
@@ -18,3 +19,11 @@ services:
     command: start --log trace --user root --pass root file:///db
     volumes:
       - "/home/glusterfs/kronikarz/db:/db"
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - "./data:/data"

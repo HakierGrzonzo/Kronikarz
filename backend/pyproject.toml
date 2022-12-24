@@ -12,6 +12,7 @@ fastapi = "^0.85.0"
 fastapi-users = "^10.1.5"
 uvicorn = "^0.18.3"
 surrealdb = {git = "https://github.com/HakierGrzonzo/surrealdb.py"}
+miniopy-async = {git = "https://github.com/HakierGrzonzo/miniopy-async.git"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
