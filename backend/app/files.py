@@ -3,7 +3,14 @@ from os import path
 from typing import List, Literal
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+)
 from fastapi.responses import StreamingResponse
 from fastapi_users import FastAPIUsers
 from miniopy_async import Minio
@@ -20,6 +27,7 @@ RoleType = Literal["picture", "document", "other"]
 class FileMeta(BaseModel):
     file_name: str
     role: RoleType
+    node: str
     owner: str
 
 
@@ -64,7 +72,10 @@ def get_file_router(fastapi_users: FastAPIUsers) -> APIRouter:
         object_id = get_object_name(tree_id)
 
         file_meta = FileMeta(
-            file_name=file_content.filename, role=role, owner=current_user.id
+            file_name=file_content.filename,
+            role=role,
+            owner=current_user.id,
+            node=node_id,
         )
 
         await minio.put_object(
@@ -141,8 +152,34 @@ def get_file_router(fastapi_users: FastAPIUsers) -> APIRouter:
                 role=file.metadata["x-amz-meta-role"],
                 file_name=file.metadata["x-amz-meta-file_name"],
                 id=file.object_name,
+                node=node.id,
             )
             for file in files
         ]
+
+    @router.get("/delete/{file_id:path}", status_code=204)
+    async def delete_file_with_id(
+        file_id: str,
+        minio: Minio = Depends(get_object_store),
+        session: Session = Depends(get_db),
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+    ):
+        try:
+            file = await minio.stat_object("kronikarz", file_id)
+        except:
+            raise HTTPException(404, "file not found")
+
+        if not file.metadata["x-amz-meta-owner"] == current_user.id:
+            raise HTTPException(403)
+
+        node = await session.Node.select_id(file.metadata["x-amz-meta-node"])
+        await session.Node.patch(
+            node.id, files=[file for file in node.files if file != file_id]
+        )
+
+        await minio.remove_object("kronikarz", file_id)
+
+        await session.commit()
+        return Response(status_code=204)
 
     return router
