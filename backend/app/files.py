@@ -1,12 +1,13 @@
 import asyncio
 from os import path
-from typing import List, Literal
+from typing import List, Literal, Optional
 from uuid import uuid4
 
 from fastapi import (
     APIRouter,
     Depends,
     File,
+    Header,
     HTTPException,
     Response,
     UploadFile,
@@ -16,10 +17,11 @@ from fastapi_users import FastAPIUsers
 from miniopy_async import Minio
 from pydantic import BaseModel
 
+from .image import convert_file
 from .object_store import get_object_store
 from .surreal_orm import Session, get_db
 from .users import UserRead
-from .utils import cache
+from .utils import cache, get_preffered_format
 
 RoleType = Literal["picture", "document", "other"]
 
@@ -123,6 +125,49 @@ def get_file_router(fastapi_users: FastAPIUsers) -> APIRouter:
         return StreamingResponse(
             read_file(), media_type=file_content.content_type
         )
+
+    @router.get(
+        "/picture/{file_id:path}",
+        response_class=StreamingResponse,
+        responses={200: {"content": {"image/jpeg": {}, "image/webp": {}}}},
+    )
+    @cache()
+    async def get_resized_picture(
+        file_id: str,
+        minio: Minio = Depends(get_object_store),
+        height: Optional[int] = None,
+        width: Optional[int] = None,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        accept: str = Header("image/jpeg"),
+    ):
+        """
+        Returns a resized image in an accepted format, the file must have
+        content_type `image/*` in order to be processed.
+
+        If no height or width is provided, **then a 400 will be returned**!
+        """
+        if height is None and width is None:
+            raise HTTPException(400, "No width or height has been provided!")
+
+        # Get a common format between us and the client
+        accept = get_preffered_format(accept, ["image/webp", "image/jpeg"])
+
+        try:
+            meta = await minio.stat_object("kronikarz", file_id)
+        except:
+            raise HTTPException(404, "file not found")
+
+        if meta.metadata["x-amz-meta-owner"] != current_user.id:
+            raise HTTPException(403)
+
+        file = await minio.get_object("kronikarz", file_id)
+        converted_file = await convert_file(file, width, height, accept)
+
+        def return_file():
+            yield converted_file.read()
+            converted_file.close()
+
+        return StreamingResponse(return_file(), 200, media_type=accept)
 
     @router.get("/{tree_id}/{node_id}", response_model=List[FileMetaResponse])
     async def get_files_for_node(

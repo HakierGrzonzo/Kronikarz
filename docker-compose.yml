@@ -15,6 +15,7 @@ services:
       - "8000:80"
     environment:
       - "DATABASE=db:8000"
+      - "MINIO_HOSTNAME=minio:9000"
     build:
       context: .
       dockerfile: Dockerfile.backend
