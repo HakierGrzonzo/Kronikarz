@@ -16,6 +16,7 @@ miniopy-async = {git = "https://github.com/HakierGrzonzo/miniopy-async.git"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
+isort = "^5.11.4"
 
 [build-system]
 requires = ["poetry-core"]

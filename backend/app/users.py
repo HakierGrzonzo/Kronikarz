@@ -1,16 +1,17 @@
-from typing import List, Optional, Dict
-from pydantic import Field
+from typing import Dict, List, Optional
+
 from fastapi import Depends, Request
-from fastapi_users import schemas, BaseUserManager, FastAPIUsers
-from fastapi_users.db.base import BaseUserDatabase
+from fastapi_users import BaseUserManager, FastAPIUsers, schemas
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
     JWTStrategy,
 )
-from .tables import User
+from fastapi_users.db.base import BaseUserDatabase
+from pydantic import Field
 
 from .surreal_orm import Session, get_db
+from .tables import User
 
 
 class UserRead(schemas.BaseUser):

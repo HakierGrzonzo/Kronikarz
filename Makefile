@@ -22,7 +22,7 @@ openapi:
 
 # Drop the database, like completely
 nuke_db:
-	rm -rf ./db/*
+	rm -rf ./db/* ./data/*
 
 # Run the whole application
 prod:

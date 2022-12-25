@@ -1,18 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from .node import get_node_router
 
-from .trees import get_tree_router
 from .files import get_file_router
+from .node import get_node_router
 from .object_store import init_minio_buckets
-
-from .users import (
-    UserRead,
-    UserCreate,
-    UserUpdate,
-    auth_backend,
-    fastapi_users,
-)
+from .trees import get_tree_router
+from .users import UserCreate, UserRead, UserUpdate, auth_backend, fastapi_users
 
 app = FastAPI()
 
@@ -50,7 +43,7 @@ app.include_router(
 
 app.include_router(
     get_file_router(fastapi_users), prefix="/api/files", tags=["files"]
-        )
+)
 
 
 @app.get("/", response_class=RedirectResponse)

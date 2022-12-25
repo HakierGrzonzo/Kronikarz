@@ -1,5 +1,6 @@
 import asyncio
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_users import FastAPIUsers
 
@@ -7,9 +8,8 @@ from app.surreal_orm.session import Session
 from app.utils import debug
 
 from .surreal_orm import get_db
-
-from .users import UserRead
 from .tables import Tree
+from .users import UserRead
 
 
 def get_tree_router(fastapi_users: FastAPIUsers) -> APIRouter:

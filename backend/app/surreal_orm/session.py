@@ -1,8 +1,9 @@
-from surrealdb.clients import WebsocketClient
 from typing import Union
 
-from .tables import TableInterface, RelationTableInterface
+from surrealdb.clients import WebsocketClient
+
 from .base import Base
+from .tables import RelationTableInterface, TableInterface
 
 
 class Session:
