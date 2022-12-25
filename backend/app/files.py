@@ -1,5 +1,6 @@
+import asyncio
 from os import path
-from typing import Literal
+from typing import List, Literal
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -111,5 +112,37 @@ def get_file_router(fastapi_users: FastAPIUsers) -> APIRouter:
         return StreamingResponse(
             read_file(), media_type=file_content.content_type
         )
+
+    @router.get("/{tree_id}/{node_id}", response_model=List[FileMetaResponse])
+    async def get_files_for_node(
+        tree_id: str,
+        node_id: str,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        minio: Minio = Depends(get_object_store),
+        session: Session = Depends(get_db),
+    ):
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        tree = await session.Tree.select_id(tree_id)
+        if node_id not in tree.nodes:
+            raise HTTPException(404, "Node not found!")
+
+        node = await session.Node.select_id(node_id)
+
+        files = await asyncio.gather(
+            *[minio.stat_object("kronikarz", file) for file in node.files]
+        )
+
+        return [
+            FileMetaResponse(
+                content_type=file.content_type,
+                owner=file.metadata["x-amz-meta-owner"],
+                role=file.metadata["x-amz-meta-role"],
+                file_name=file.metadata["x-amz-meta-file_name"],
+                id=file.object_name,
+            )
+            for file in files
+        ]
 
     return router
