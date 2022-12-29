@@ -4,18 +4,17 @@ import {
   IconButton,
   Toolbar,
   Typography,
-  List,
-  ListItemButton,
-  ListItemText,
-  useTheme,
+  Avatar,
+  Stack,
+  Tooltip,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
 import type { LoaderFunction } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useMatches } from "@remix-run/react";
-import { useState } from "react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
+import { UserRead } from "src/client";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");
@@ -27,19 +26,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json(user);
 };
 
-const routes: { name: string; to: string }[] = [
-  { name: "Dashboard", to: "/home" },
-  { name: "Logout", to: "/login" },
-];
-
-export default function Index() {
-  const user = useLoaderData();
-  const theme = useTheme();
-  const matches = useMatches();
-  const matchCandidate = matches
-    .filter((m) => routes.map((r) => r.to).includes(m.pathname))
-    .at(-1);
-  const [menuOpen, setMenuOpen] = useState<boolean>(true);
+export default function () {
+  const user = useLoaderData() as UserRead;
   return (
     <>
       <AppBar
@@ -64,20 +52,23 @@ export default function Index() {
               flexDirection: "row",
             }}
           >
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <MenuIcon />
-            </IconButton>
             <Typography variant="h6">Kronikarz</Typography>
           </Box>
-          <Typography variant="h6">
-            {routes.find((r) => matchCandidate?.pathname === r.to)?.name}
-          </Typography>
-          <Typography>Welcome back {user.email}</Typography>
+          <Stack direction="row" spacing={2}>
+            <Link to=".">
+              <IconButton>
+                <HomeIcon />
+              </IconButton>
+            </Link>
+            <Link to="user">
+              <Tooltip title="User options">
+                <Avatar
+                  alt="user options"
+                  src={`https://source.boringavatars.com/beam/120/${user.id}?colors=264653,f4a261,e76f51`}
+                />
+              </Tooltip>
+            </Link>
+          </Stack>
         </Toolbar>
       </AppBar>
       <Box
@@ -85,90 +76,10 @@ export default function Index() {
           display: "flex",
           flexDirection: "row",
           height: "calc(100vh - 64px)",
+          padding: 1,
         }}
       >
-        <Box
-          sx={{
-            width: menuOpen ? "5cm" : "0cm",
-            overflow: "visible",
-            transition: "all 500ms",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            translate: menuOpen ? "0cm" : "-5cm",
-          }}
-        >
-          <List sx={{ width: "5cm" }} component="nav">
-            {routes.map((route) => {
-              const isSelected = matchCandidate?.pathname === route.to;
-              return (
-                <Link
-                  to={route.to}
-                  key={route.to}
-                  style={{
-                    color: isSelected
-                      ? theme.palette.text.primary
-                      : theme.palette.text.secondary,
-                    textDecoration: "none",
-                  }}
-                >
-                  <ListItemButton selected={isSelected}>
-                    <ListItemText>{route.name}</ListItemText>
-                  </ListItemButton>
-                </Link>
-              );
-            })}
-          </List>
-          <Box sx={{ padding: 1, width: "5cm" }}>
-            <img
-              src="/logo.png"
-              style={{ width: "100%" }}
-              alt="Kronikarz logo"
-            />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-            height: "calc(100vh - 64px - 16px)",
-            margin: 1,
-          }}
-        >
-          <Box
-            sx={{
-              overflowY: "auto",
-              overflowX: "hidden",
-              height: "calc(100vh - 64px - 16px - 1cm)",
-            }}
-          >
-            <Outlet />
-          </Box>
-          <Box
-            sx={{
-              height: "1cm",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="caption">
-              <Link to="/support" style={{ color: theme.palette.grey[600] }}>
-                Support
-              </Link>{" "}
-              <a
-                href="https://github.com/HakierGrzonzo/kronikarz"
-                style={{ color: theme.palette.grey[600] }}
-              >
-                Github
-              </a>
-            </Typography>
-            <Typography variant="caption" color={theme.palette.grey[600]}>
-              <strong>NOT FOR COMMERCIAL USE</strong>
-            </Typography>
-            <Typography variant="caption" color={theme.palette.grey[600]}>
-              Copyright 2022
-            </Typography>
-          </Box>
-        </Box>
+        <Outlet />
       </Box>
     </>
   );

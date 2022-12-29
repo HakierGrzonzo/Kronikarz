@@ -1,5 +1,5 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import { Headers, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -36,9 +36,14 @@ export default function App() {
       <head>
         <Meta />
         <Links />
+        <meta name="theme-color" content={theme.palette.primary.main} />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <meta
+          name="emotion-insertion-point"
+          content="emotion-insertion-point"
         />
       </head>
       <body
