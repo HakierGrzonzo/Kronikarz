@@ -106,7 +106,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "there is no such node")
+            raise HTTPException(400, "Node not found!")
 
         return await session.Node.select_id(node_id)
 
@@ -124,7 +124,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "there is no such node")
+            raise HTTPException(404, "Node not found!")
         await asyncio.gather(
             session.User.patch(
                 current_user.id,
@@ -148,7 +148,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
-            raise HTTPException(400, "there is no such node")
+            raise HTTPException(404, "Node not found!")
         node = await session.Node.patch(node_id, props=new_props)
         await session.commit()
         return node
