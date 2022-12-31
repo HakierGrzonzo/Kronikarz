@@ -1,5 +1,6 @@
 services:
   frontend:
+    restart: always
     ports:
       - "3000:3000"
     image: hakiergrzonzo/kronikarz-frontend:main
@@ -9,18 +10,21 @@ services:
       - backend
 
   backend:
+    restart: always
     environment:
       - "DATABASE=db:8000"
       - "MINIO_HOSTNAME=minio:9000"
     image: hakiergrzonzo/kornikarz-backend:main
 
   db:
+    restart: always
     image: surrealdb/surrealdb:latest
     command: start --log trace --user root --pass root file:///db
     volumes:
       - "/home/glusterfs/kronikarz/db:/db"
 
   minio:
+    restart: always
     image: minio/minio
     ports:
       - "9001:9001"
