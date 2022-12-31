@@ -108,9 +108,9 @@ jobs:
           port: ${{ secrets.PROD_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/${{ secrets.PROD_USER }}/Kronikarz/production
-            docker-compose pull
-            docker-compose down 
-            git pull
-            docker-compose up -d
+            cd /home/${{ secrets.PROD_USER }}/Kronikarz/production &&
+            docker-compose pull &&
+            docker-compose down &&
+            git pull &&
+            docker-compose up -d &&
             fortune /usr/share/fortune/pony
