@@ -1,13 +1,17 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel
 
-from .surreal_orm.relation import RelationList
 from .surreal_orm import base
+from .surreal_orm.relation import RelationList
+
+FileID = str
 
 
 @base.table
 class Node(BaseModel):
     props: Dict
+    files: List[FileID]
 
 
 @base.edge(Node, Node)

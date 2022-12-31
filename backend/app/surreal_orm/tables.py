@@ -1,14 +1,12 @@
-from surrealdb.common.json import dumps
+from typing import Dict, List, Optional, Protocol, Tuple, TypeVar, Union
+
 from pydantic import BaseModel, Field
 from surrealdb.clients import WebsocketClient
-from typing import Dict, Protocol, Tuple, Optional, List, TypeVar, Union
+from surrealdb.common.json import dumps
 
 from app.surreal_orm.relation import Relation
-from .utils import (
-    change_data_to_relation,
-    quote_param,
-    change_data_to_relation,
-)
+
+from .utils import change_data_to_relation, quote_param
 
 T = TypeVar("T", covariant=True)
 R = TypeVar("R")

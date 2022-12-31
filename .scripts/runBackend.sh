@@ -4,7 +4,7 @@ set -e
 
 cd ./backend
 
-docker-compose up --build db &
+docker-compose up --build db minio &
 
 poetry run uvicorn app:app --reload
 

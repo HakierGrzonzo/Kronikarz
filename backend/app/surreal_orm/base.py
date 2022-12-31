@@ -1,12 +1,9 @@
 from pydantic import BaseModel
-from .tables import get_table_class, get_relation_class
-
 
 from app.utils import debug
-from .utils import (
-    quote_param,
-    change_data_to_relation,
-)
+
+from .tables import get_relation_class, get_table_class
+from .utils import change_data_to_relation, quote_param
 
 
 class Base:

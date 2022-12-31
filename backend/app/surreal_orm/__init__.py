@@ -1,6 +1,8 @@
 from os import environ
 from typing import AsyncGenerator
+
 from surrealdb.clients import WebsocketClient
+
 from .base import base
 from .session import Session
 

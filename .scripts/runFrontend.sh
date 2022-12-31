@@ -4,7 +4,7 @@ set -e
 
 cd ./frontend
 
-docker-compose up --build db backend &
+docker-compose up --build db backend minio &
 
 npm run dev
 

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
 import asyncio
 from typing import Dict, List
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi_users import FastAPIUsers
 
 from app.surreal_orm import get_db
@@ -24,7 +25,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
 
         node, tree = await asyncio.gather(
-            session.Node.create(props=node_props),
+            session.Node.create(props=node_props, files=list()),
             session.Tree.select_deep(tree_id, ["nodes"]),
         )
 
