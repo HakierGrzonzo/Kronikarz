@@ -7,8 +7,19 @@ export function getCookie(request: Request, name: string) {
     return cookie
 }
 
-export function getCookieToDelete(name: string) {
+export function cookieMaker(cookies: string[]) {
+    return cookies.reduce((headers, curr) => {
+        headers.append("Set-Cookie", curr);
+        return headers;
+    }, new Headers());
+}
+
+export function deleteCookie(name: string) {
     return `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`
+}
+
+export function makeCookie(name: string, value: string) {
+    return `${name}=${value}`
 }
 
 export function setCookieNameAndValueToHeader(name: string, value: string) {
@@ -26,6 +37,6 @@ export function deleteAllCookies(request: Request) {
     }
     return cookies.map((c) => {
         const name = c.split("=")[0]
-        return getCookieToDelete(name)
+        return deleteCookie(name)
     })
 }

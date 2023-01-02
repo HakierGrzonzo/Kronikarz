@@ -10,7 +10,7 @@ import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useTransition } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
-import { getCookieToDelete } from "~/utils/cookieUtils";
+import { cookieMaker, deleteCookie, makeCookie } from "~/utils/cookieUtils";
 
 export const action: ActionFunction = async ({ request }) => {
   const api = createApiClient();
@@ -19,12 +19,8 @@ export const action: ActionFunction = async ({ request }) => {
     const resp = await api.auth.authJwtLoginApiAuthJwtLoginPost({
       username: formData.get("email") as string,
       password: formData.get("password") as string,
-    });
-    const cookies = [getCookieToDelete("isFirstTime"), `token=${resp.access_token}`];
-    const headers = cookies.reduce((headers, curr) => {
-      headers.append("Set-Cookie", curr);
-      return headers;
-    }, new Headers());
+    })
+    const headers = cookieMaker([makeCookie('token', resp.access_token), deleteCookie("isFirstTime")])
     return redirect("/home", {
       headers
     });
