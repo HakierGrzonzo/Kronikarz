@@ -1,7 +1,8 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
+from .models import InputProps, PartialDate
 from .surreal_orm import base
 from .surreal_orm.relation import RelationList
 
@@ -9,9 +10,26 @@ FileID = str
 
 
 @base.table
+class FieldSetTemplate(BaseModel):
+    name: str
+    fields: List[InputProps]
+
+
+@base.table
 class Node(BaseModel):
-    props: Dict
     files: List[FileID]
+    cover_photo: Optional[FileID]
+    field_values: Dict[
+        str,
+        List[
+            Union[
+                None,
+                PartialDate,
+                float,
+                str,
+            ]
+        ],
+    ]
 
 
 @base.edge(Node, Node)
@@ -31,6 +49,7 @@ class User(BaseModel):
     id: str
     email: str
     hashed_password: str
+    field_set_templates: RelationList[FieldSetTemplate]
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = True

@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
+from .field_sets import get_field_set_router
 from .files import get_file_router
 from .node import get_node_router
 from .object_store import init_minio_buckets
 from .trees import get_tree_router
-from .users import UserCreate, UserRead, UserUpdate, auth_backend, fastapi_users
+from .users import (
+    UserCreate,
+    UserRead,
+    UserUpdate,
+    cookie_backend,
+    fastapi_users,
+    token_backend,
+)
 
 app = FastAPI()
 
@@ -16,8 +24,14 @@ async def init_application():
 
 
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend),
+    fastapi_users.get_auth_router(token_backend),
     prefix="/api/auth/jwt",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_auth_router(cookie_backend),
+    prefix="/api/auth/cookie",
     tags=["auth"],
 )
 
@@ -34,11 +48,15 @@ app.include_router(
 )
 
 app.include_router(
-    get_tree_router(fastapi_users), prefix="/api/trees", tags=["data"]
+    get_tree_router(fastapi_users), prefix="/api/trees", tags=["trees"]
 )
 
 app.include_router(
-    get_node_router(fastapi_users), prefix="/api/nodes", tags=["data"]
+    get_node_router(fastapi_users), prefix="/api/nodes", tags=["nodes"]
+)
+
+app.include_router(
+    get_field_set_router(fastapi_users), prefix="/api/fields", tags=["fields"]
 )
 
 app.include_router(

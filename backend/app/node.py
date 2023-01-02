@@ -17,15 +17,21 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
     @router.post("/new/{tree_id}", response_model=Node)
     async def create_new_node(
         tree_id: str,
-        node_props: Dict,
+        field_values: Dict,
         session: Session = Depends(get_db),
         current_user: UserRead = Depends(fastapi_users.current_user()),
     ):
-        if tree_id not in current_user.trees:
+        if tree_id not in current_user.trees or any(
+            field_set_template not in current_user.field_set_templates
+            for field_set_template in field_values.keys() 
+        ):
             raise HTTPException(403)
 
         node, tree = await asyncio.gather(
-            session.Node.create(props=node_props, files=list()),
+            session.Node.create(
+                files=list(),
+                field_values=field_values,
+            ),
             session.Tree.select_deep(tree_id, ["nodes"]),
         )
 
@@ -140,17 +146,22 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
     async def edit_node(
         tree_id: str,
         node_id: str,
-        new_props: Dict,
+        field_values: Dict,
         current_user: UserRead = Depends(fastapi_users.current_user()),
         session: Session = Depends(get_db),
     ):
         "Editing node"
-        if tree_id not in current_user.trees:
+        if tree_id not in current_user.trees or any(
+            field_set_template not in current_user.field_set_templates
+            for field_set_template in field_values.keys()
+        ):
             raise HTTPException(403)
         tree = await session.Tree.select_id(tree_id)
         if node_id not in tree.nodes:
             raise HTTPException(404, "Node not found!")
-        node = await session.Node.patch(node_id, props=new_props)
+        node = await session.Node.patch(
+            node_id, field_values=field_values
+        )
         await session.commit()
         return node
 
