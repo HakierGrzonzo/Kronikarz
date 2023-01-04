@@ -25,7 +25,9 @@ export const action: ActionFunction = async ({ request }) => {
       },
     });
   } catch {
-    return json({ msg: "Wrong/empty email or password. Or this user already exist" });
+    return json({
+      msg: "Wrong/empty email or password. Or this user already exist",
+    });
   }
 };
 
@@ -52,7 +54,10 @@ export default function Login() {
         }}
       >
         <Form method="post">
-          <Typography variant="h2" sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}>
+          <Typography
+            variant="h2"
+            sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}
+          >
             Please Register:
           </Typography>
           <Box

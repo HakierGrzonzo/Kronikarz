@@ -19,10 +19,13 @@ export const action: ActionFunction = async ({ request }) => {
     const resp = await api.auth.authJwtLoginApiAuthJwtLoginPost({
       username: formData.get("email") as string,
       password: formData.get("password") as string,
-    })
-    const headers = cookieMaker([makeCookie('token', resp.access_token), deleteCookie("isFirstTime")])
+    });
+    const headers = cookieMaker([
+      makeCookie("token", resp.access_token),
+      deleteCookie("isFirstTime"),
+    ]);
     return redirect("/home", {
-      headers
+      headers,
     });
   } catch {
     return json({ msg: "Wrong email or password" });
@@ -51,7 +54,10 @@ export default function Login() {
         }}
       >
         <Form method="post">
-          <Typography variant="h2" sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}>
+          <Typography
+            variant="h2"
+            sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}
+          >
             Please Login:
           </Typography>
           <Box
