@@ -1,6 +1,5 @@
-import { AppBar, Box, Card, Typography, Button, Divider } from "@mui/material";
-import { Link } from "@remix-run/react";
-import { MetaFunction } from "@remix-run/node";
+import { Box, Button } from "@mui/material";
+import type { MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => ({
   title: "Kronikarz: free tool for family trees",

@@ -15,15 +15,10 @@ import { redirect, json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatches } from "@remix-run/react";
 import { useState } from "react";
 import { createApiClient } from "~/createApiClient";
+import { getCookie } from "~/utils/cookieUtils";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const cookies = request.headers.get("Cookie")?.split(";");
-  if (!cookies) {
-    throw redirect("/login");
-  }
-  const token = cookies
-    ?.find((c) => c.trim().startsWith("token="))
-    ?.split("=")[1];
+  const token = getCookie(request, "token");
   if (!token) {
     throw redirect("/login");
   }
