@@ -1,7 +1,7 @@
 from datetime import timedelta
 from functools import wraps
 from inspect import iscoroutinefunction
-from typing import Callable, List, Optional
+from typing import Callable, List
 
 from fastapi import Response
 
@@ -11,30 +11,36 @@ def debug(f: Callable):
 
         @wraps(f)
         async def innerAsync(*args, **kwargs):
-            res = await f(*args, **kwargs)
-            print(
-                f"f: {f.__name__}:",
-                f"{repr(args)}",
-                f"& {repr(kwargs)}",
-                f"-> {repr(res)}",
-                sep="\t",
-                flush=True,
-            )
+            res = "ERROR"
+            try:
+                res = await f(*args, **kwargs)
+            finally:
+                print(
+                    f"f: {f.__name__}:",
+                    f"{repr(args)}",
+                    f"& {repr(kwargs)}",
+                    f"-> {repr(res)}",
+                    sep="\n\t",
+                    flush=True,
+                )
             return res
 
         return innerAsync
 
     @wraps(f)
     def inner(*args, **kwargs):
-        res = f(*args, **kwargs)
-        print(
-            f"f: {f.__name__}:",
-            f"{repr(args)}",
-            f"& {repr(kwargs)}",
-            f"-> {repr(res)}",
-            sep="\t",
-            flush=True,
-        )
+        res = "ERROR"
+        try:
+            res = f(*args, **kwargs)
+        finally:
+            print(
+                f"f: {f.__name__}:",
+                f"{repr(args)}",
+                f"& {repr(kwargs)}",
+                f"-> {repr(res)}",
+                sep="\n\t",
+                flush=True,
+            )
         return res
 
     return inner

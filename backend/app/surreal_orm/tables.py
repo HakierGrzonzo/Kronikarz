@@ -161,6 +161,12 @@ def get_table_class(
                 raise Exception("Failed to fetch by id!")
             return TableEntry(**result[0])
 
+        async def execute(self, query: str, params: List[str]) -> TableEntry:
+            """Executes a raw query on the database"""
+            return await self._client.query(
+                query.format(map(quote_param, params))
+            )
+
         async def select_related(self, id: str, relation: type[R]) -> List[R]:
             """Selects given relations (edges) that come out of the given
             id"""
@@ -250,6 +256,15 @@ def get_relation_class(
             if len(res) != 1:
                 raise Exception("Failed to create relation")
             return RelationEntry(**res[0])
+
+        async def update_all(
+            self,
+            from_obj: Union[from_class, str],
+            to_obj: Union[to_class, str],
+            **data: Dict,
+        ):
+            """Updates all relations from one record to another"""
+            res = await self._client.query("UPDATE {}->{}->{}")
 
     RelationEntry.__name__ = pydantic_class.__name__
 

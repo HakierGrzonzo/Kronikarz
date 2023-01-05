@@ -49,20 +49,6 @@ def get_field_set_router(fastapi_users: FastAPIUsers):
         if field_set_id not in current_user.field_set_templates:
             raise HTTPException(404, "Field set not found!")
 
-        user = await session.User.select_deep(
-            current_user.id, ("trees", "trees.nodes")
-        )
-
-        for tree in user.trees:
-            for node in tree.nodes:
-                if field_set_id in node.field_values.keys():
-                    del node.field_values[field_set_id]
-                    print(node.field_values)
-                    await session.Node.patch(
-                        node.id,
-                        field_values=node.field_values
-                    )
-
         await asyncio.gather(
             session.FieldSetTemplate.delete(field_set_id),
             session.User.patch(
@@ -73,5 +59,6 @@ def get_field_set_router(fastapi_users: FastAPIUsers):
                 ),
             ),
         )
+        await session.commit()
 
     return router

@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 from pydantic import BaseModel
 
@@ -18,18 +18,15 @@ class FieldSetTemplate(BaseModel):
 @base.table
 class Node(BaseModel):
     files: List[FileID]
-    cover_photo: Optional[FileID]
-    field_values: Dict[
-        str,
-        List[
-            Union[
-                None,
-                PartialDate,
-                float,
-                str,
-            ]
-        ],
-    ]
+
+
+class RawNodeValues(BaseModel):
+    values: List[Union[None, PartialDate, float, str]]
+
+
+@base.edge(Node, FieldSetTemplate)
+class NodeValues(RawNodeValues):
+    pass
 
 
 @base.edge(Node, Node)
