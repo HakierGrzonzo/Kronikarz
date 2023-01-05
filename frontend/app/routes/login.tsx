@@ -32,12 +32,10 @@ export const action: ActionFunction = async ({ request }) => {
   }
 };
 
-
 export default function Login() {
   const transition = useTransition();
   const actionMsg = useActionData();
   return (
-
     <Box
       sx={{
         maxHeight: "100vh",
@@ -53,18 +51,16 @@ export default function Login() {
         alt="Kronikarz logo"
         style={{ maxHeight: "80vh", width: "auto" }}
       />
-      <Form method="post" style={
-        {
+      <Form
+        method="post"
+        style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           marginTop: "-3cm",
-        }
-      }>
-        <Typography
-          variant="h2"
-          sx={{ textAlign: "center" }}
-        >
+        }}
+      >
+        <Typography variant="h2" sx={{ textAlign: "center" }}>
           Please Login:
         </Typography>
         <Box
@@ -102,7 +98,6 @@ export default function Login() {
           )}
         </Box>
         <Button
-          sx={{ fontSize: "150%" }}
           variant="contained"
           type="submit"
           disabled={transition.state === "submitting"}
