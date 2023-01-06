@@ -58,7 +58,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const { treeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
   await api.nodes.createNewNodeApiNodesNewTreeIdPost(treeID, values);
-  return redirect("..");
+  return "success";
 };
 
 export default function AddNewPerson() {

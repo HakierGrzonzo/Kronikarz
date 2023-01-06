@@ -4,7 +4,7 @@ import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { LoaderFunction, redirect, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Node } from "src/client";
-import { FieldSetTemplate, InputProps } from "~/client";
+import { FieldSetTemplate, InputProps, NodeValues } from "~/client";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 
@@ -20,11 +20,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     api.trees.getDetailedTreeApiTreesTreeIdGet(treeID),
     api.fields.getMyFieldsetsApiFieldsMyGet(),
   ]);
-  return json({ tree, fields });
+  const values = await Promise.all(
+    tree.nodes.map(async (node) => {
+      const value =
+        await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
+          treeID,
+          (node as unknown as Node).id
+        );
+      return { node, value };
+    })
+  );
+  return json({ fields, values });
 };
 
 export default function PeopleView() {
-  const { tree, fields } = useLoaderData();
+  const { fields, values } = useLoaderData();
   const gridColumns: GridColDef[] = fields
     .flatMap((fieldSet: FieldSetTemplate) =>
       fieldSet.fields.map((field, index) => ({
@@ -37,12 +47,22 @@ export default function PeopleView() {
       field: `${field.set.id}-${field.index}`,
       headerName: field.name,
     }));
-  const gridRows: GridRowsProp = tree.nodes.map((node: Node) => {
-    const { id } = node;
-    return {
-      id,
-    };
-  });
+  const gridRows: GridRowsProp = values.map(
+    (nodeAndValues: { node: Node; value: NodeValues[] }) => {
+      const { node, value } = nodeAndValues;
+      return {
+        id: node.id,
+        ...Object.fromEntries(
+          value.flatMap((nodeValue) => {
+            return nodeValue.values.map((v, index) => [
+              `${nodeValue.out.id}-${index}`,
+              v,
+            ]);
+          })
+        ),
+      };
+    }
+  );
   const columnGrouping = fields.map((fieldSet: FieldSetTemplate) => ({
     groupId: fieldSet.id,
     headerName: fieldSet.name,
