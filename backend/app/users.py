@@ -53,7 +53,12 @@ class SurrealUsersDatabase(BaseUserDatabase[User, str]):
     async def create(self, create_dict: Dict) -> User:
         base_field_set = await self._session.FieldSetTemplate.create(
             name="Base Set",
-            fields=[InputProps(name="name", type="text", required=True)],
+            fields=[
+                InputProps(name="name", type="text", required=True),
+                InputProps(name="surname", type="text", required=False),
+                InputProps(name="birth-day", type="date", required=False),
+                InputProps(name="death-day", type="date", required=False),
+            ],
         )
         res = await self._session.User.create(
             **create_dict, trees=[], field_set_templates=[base_field_set.id]
