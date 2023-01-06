@@ -56,6 +56,7 @@ export default function Login() {
       />
       <Form
         method="post"
+        replace
         style={{
           display: "flex",
           flexDirection: "column",

@@ -53,7 +53,7 @@ export default function () {
             />
             <CardActions>
               <Link to={`/editor/${tree.id}`}>
-                <Button variant="contained">Edit</Button>
+                <Button variant="contained">Open</Button>
               </Link>
             </CardActions>
           </Card>
