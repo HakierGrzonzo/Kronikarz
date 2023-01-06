@@ -30,9 +30,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function () {
   const trees = useLoaderData() as Tree[];
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={2} sx={{ maxWidth: "100%" }}>
       <Typography variant="h3">Your family trees:</Typography>
-      <Stack direction="row" alignItems="stretch" spacing={2}>
+      <Stack
+        direction="row"
+        sx={{ flexWrap: "wrap", maxWidth: "100%", gap: 2 }}
+        alignItems="stretch"
+      >
         {trees.map((tree) => (
           <Card sx={{ minWidth: 400 }} key={tree.id}>
             {/* TODO: Photo of a random person from the tree? */}
