@@ -30,6 +30,8 @@ def change_data_to_relation(data: Dict) -> Dict:
         elif isinstance(value, Iterable):
             # If data is a listlike, then check all elements
             return [check_data(v) for v in value]
+        elif value is None:
+            return None
         else:
             # Value is a weird, unhandled type
             raise Exception(
@@ -51,5 +53,7 @@ def quote_param(param: Any) -> str:
             return str(param)
         case float():
             return str(param)
+        case None:
+            return "null"
         case _:
             raise Exception("Unsupported Param for quoting, pls add more")
