@@ -30,6 +30,14 @@ NODE=$(curl -s -X 'POST' \
   -H 'Content-Type: application/json' \
   -d "{\"$FIELD_TEST\": {\"values\": [\"food\"]}}" | jq -r .id)
 
+echo "Create the second Node"
+NODE_TWO=$(curl -s -X 'POST' \
+  "http://localhost:8000/api/nodes/new/$TREE" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d "{\"$FIELD_TEST\": {\"values\": [\"food\"]}}" | jq -r .id)
+
 echo "Nodes in $TREE"
 curl -s -X 'GET' \
   "http://localhost:8000/api/nodes/values/$TREE/$NODE" \
@@ -43,6 +51,19 @@ curl -s -X 'POST' \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $TOKEN" \
   --data-raw '{"values": ["monkey"]}' | jq
+
+echo "Remove field set from $NODE_TWO"
+curl -s -X 'POST' \
+  "http://localhost:8000/api/nodes/$TREE/$NODE_TWO/$FIELD_TEST/delete" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '' | jq
+
+echo "Node values after removing $FIELD_TEST"
+curl -s -X 'GET' \
+  "http://localhost:8000/api/nodes/values/$TREE/$NODE_TWO" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $TOKEN" | jq
 
 echo "Delete $FIELD_TEST"
 curl -s -X 'POST' \

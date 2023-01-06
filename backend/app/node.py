@@ -173,7 +173,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         current_user: UserRead = Depends(fastapi_users.current_user()),
         session: Session = Depends(get_db),
     ):
-        "Editing node"
+        "Editing values on node"
         if (
             tree_id not in current_user.trees
             or field_set_id not in current_user.field_set_templates
@@ -197,6 +197,42 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         else:
             relation_id = relations[0].id
             res = await session.NodeValues.patch(relation_id, **values.dict())
+
+        await session.commit()
+        return res
+
+    @router.post("/{tree_id}/{node_id}/{field_set_id}/delete")
+    async def remove_values_from_node(
+        tree_id: str,
+        node_id: str,
+        field_set_id: str,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        session: Session = Depends(get_db),
+    ):
+        "Removing a set of values from the node"
+        if (
+            tree_id not in current_user.trees
+            or field_set_id not in current_user.field_set_templates
+        ):
+            raise HTTPException(403)
+
+        tree = await session.Tree.select_id(tree_id)
+        if node_id not in tree.nodes:
+            raise HTTPException(404, "Node not found!")
+
+        node_values = await session.Node.select_related(node_id, NodeValues)
+        relations = list(
+            filter(lambda item: item.out.id == field_set_id, node_values)
+        )
+        if len(relations) > 1:
+            raise HTTPException(500, "Multiple same field_sets for this node!")
+        elif len(relations) == 1:
+            relation = relations[0]
+            res = await session.NodeValues.delete(relation.id)
+        else:
+            raise HTTPException(
+                404, "Failed to find such a relation on this node"
+            )
 
         await session.commit()
         return res
