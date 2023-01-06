@@ -16,7 +16,7 @@ export const action: ActionFunction = async ({ request }) => {
   const api = createApiClient();
   const formData = await request.formData();
   try {
-    const resp = await api.auth.authJwtLoginApiAuthJwtLoginPost({
+    const resp = await api.auth.authTokenLoginApiAuthJwtLoginPost({
       username: formData.get("email") as string,
       password: formData.get("password") as string,
     });
