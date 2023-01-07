@@ -4,6 +4,7 @@ import {
   Stack,
   IconButton,
   Box,
+  Tooltip,
 } from "@mui/material";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
@@ -13,6 +14,7 @@ import { useLoaderData, Link, Outlet, useMatches } from "@remix-run/react";
 import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
+import { PlaylistAdd } from "@mui/icons-material";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -30,6 +32,7 @@ const pages = {
   ["Tree View"]: { icon: PolylineIcon, path: "." },
   ["People View"]: { icon: Diversity3Icon, path: "./people" },
   ["Add new Person"]: { icon: PersonAddAlt1Icon, path: "./addPerson" },
+  ["Create new Field set"]: { icon: PlaylistAdd, path: "./addFieldSet" },
 };
 
 export default function Editor() {
@@ -50,11 +53,13 @@ export default function Editor() {
             <Stack direction="row" justifyContent="space-between" spacing={1}>
               {Object.entries(pages).map(([pageID, page]) => (
                 <Link to={page.path} key={pageID}>
-                  <IconButton
-                    color={currentPageID === pageID ? "info" : "default"}
-                  >
-                    <page.icon />
-                  </IconButton>
+                  <Tooltip title={pageID}>
+                    <IconButton
+                      color={currentPageID === pageID ? "info" : "default"}
+                    >
+                      <page.icon />
+                    </IconButton>
+                  </Tooltip>
                 </Link>
               ))}
             </Stack>

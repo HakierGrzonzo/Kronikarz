@@ -13,6 +13,7 @@ import {
   Typography,
   AccordionDetails,
   TextField,
+  IconButton,
 } from "@mui/material";
 
 import {
@@ -25,7 +26,7 @@ import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { useEffect, useState } from "react";
 import { FieldSetTemplate, RawNodeValues } from "~/client";
-import { ExpandMore } from "@mui/icons-material";
+import { Delete, ExpandMore } from "@mui/icons-material";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -72,6 +73,7 @@ export default function AddNewPerson() {
 
   return (
     <Box sx={{ padding: 1, width: "100%" }}>
+      <Typography variant="h3">Add a new person</Typography>
       <Form replace method="post">
         {selectedFields
           .map((fieldSetId) => fields.find((f) => f.id === fieldSetId))
@@ -80,14 +82,26 @@ export default function AddNewPerson() {
               fieldSet && (
                 <Accordion key={fieldSet.id}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h6">{fieldSet.name}</Typography>
+                    <Typography sx={{ flex: 1 }} variant="h6">
+                      {fieldSet.name}
+                    </Typography>
+                    <IconButton
+                      onClick={() =>
+                        setFields(
+                          selectedFields.filter((set) => set !== fieldSet.id)
+                        )
+                      }
+                    >
+                      <Delete />
+                    </IconButton>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Stack direction="row" sx={{ gap: 2 }}>
+                    <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
                       {fieldSet.fields.map((field, index) => (
                         <TextField
                           key={index}
                           label={field.name}
+                          type={field.type}
                           name={`${fieldSet.id}-${index}`}
                           required={field.required}
                         />
