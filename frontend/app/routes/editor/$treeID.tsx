@@ -3,7 +3,6 @@ import {
   Toolbar,
   Stack,
   IconButton,
-  useTheme,
   Box,
 } from "@mui/material";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
@@ -11,7 +10,7 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PolylineIcon from "@mui/icons-material/Polyline";
 import { LoaderFunction, redirect, json } from "@remix-run/node";
 import { useLoaderData, Link, Outlet, useMatches } from "@remix-run/react";
-import AppBarRight from "src/components/AppBarRight";
+import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 
@@ -34,7 +33,6 @@ const pages = {
 };
 
 export default function Editor() {
-  const theme = useTheme();
   const user = useLoaderData();
   const matches = useMatches();
   const currentPageID =

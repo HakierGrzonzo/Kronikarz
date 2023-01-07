@@ -8,7 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import CookieConsent from "src/components/CookieConsent";
+import CookieConsent from "~/components/CookieConsent";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
