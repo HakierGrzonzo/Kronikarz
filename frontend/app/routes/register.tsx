@@ -39,82 +39,77 @@ export default function Login() {
   const transition = useTransition();
   const actionMsg = useActionData();
   return (
-    <>
-      <Box
-        sx={{
+    <Box
+      sx={{
+        maxHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <img
+        src="/logo.png"
+        alt="Kronikarz logo"
+        style={{ maxHeight: "80vh", width: "auto" }}
+      />
+      <Form
+        method="post"
+        replace
+        style={{
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
-          height: "100vh",
-          backgroundImage: "url(/background.png)",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
-          backgroundSize: "contain",
-          backgroundColor: "#e0edf2",
+          marginTop: "-3cm",
         }}
       >
-        <Form method="post">
-          <Typography
-            variant="h2"
-            sx={{ margin: "515px 0 25px 26px", textAlign: "center" }}
-          >
-            Please Register:
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-              width: "60vw",
-              marginLeft: "26px",
-            }}
-          >
-            {transition.state !== "submitting" ? (
-              <>
-                <TextField name="email" type="email" id="email" label="email" />
-                <TextField
-                  name="password"
-                  type="password"
-                  id="password"
-                  label="password"
-                />
-              </>
-            ) : (
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "4cm",
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            )}
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              width: "60vw",
-              marginTop: "30px",
-              marginBottom: "20px",
-              marginLeft: "26px",
-            }}
-          >
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={transition.state === "submitting"}
+        <Typography variant="h2" sx={{ textAlign: "center" }}>
+          Please Register:
+        </Typography>
+        <Box
+          sx={{
+            display: "grid",
+            padding: 1,
+            gap: 6,
+            gridTemplateColumns: "1fr 1fr",
+            maxWidth: "18cm",
+            justifyContent: "space-around",
+          }}
+        >
+          {transition.state !== "submitting" ? (
+            <>
+              <TextField name="email" type="email" id="email" label="email" />
+              <TextField
+                name="password"
+                type="password"
+                id="password"
+                label="password"
+              />
+            </>
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "4cm",
+              }}
             >
-              Submit
-            </Button>
-          </Box>
-          {actionMsg && <Alert severity="error">{actionMsg.msg}</Alert>}
-        </Form>
-      </Box>
-    </>
+              <CircularProgress />
+            </Box>
+          )}
+        </Box>
+        <Button
+          variant="contained"
+          type="submit"
+          disabled={transition.state === "submitting"}
+        >
+          Submit
+        </Button>
+        {actionMsg && <Alert severity="error">{actionMsg.msg}</Alert>}
+      </Form>
+    </Box>
   );
 }

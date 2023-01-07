@@ -10,12 +10,16 @@ import {
 import { useEffect, useState } from "react";
 
 export default function CookieConsent() {
-  const [cookieConsent, setCookieConsent] = useState<boolean>(false);
+  // Start the popup as closed to not flash in the user face on load
+  const [cookieConsent, setCookieConsent] = useState<boolean>(true);
   useEffect(() => {
     const rawCookieConsent = localStorage.getItem("cookieConsent");
     if (rawCookieConsent) {
       // If there is a value, then we must have set it to true
       setCookieConsent(true);
+    } else {
+      // Else show the cookie popup
+      setCookieConsent(false);
     }
   }, [setCookieConsent]);
 
