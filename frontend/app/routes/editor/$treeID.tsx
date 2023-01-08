@@ -14,7 +14,7 @@ import { useLoaderData, Link, Outlet, useMatches } from "@remix-run/react";
 import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import { PlaylistAdd } from "@mui/icons-material";
+import { PlaylistAdd, Reorder } from "@mui/icons-material";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -32,6 +32,7 @@ const pages = {
   ["Tree View"]: { icon: PolylineIcon, path: "." },
   ["People View"]: { icon: Diversity3Icon, path: "./people" },
   ["Add new Person"]: { icon: PersonAddAlt1Icon, path: "./addPerson" },
+  ["My Field Sets"]: { icon: Reorder, path: "./fieldSets" },
   ["Create new Field set"]: { icon: PlaylistAdd, path: "./addFieldSet" },
 };
 
