@@ -5,17 +5,20 @@ from fastapi_users import BaseUserManager, FastAPIUsers, schemas
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
+    CookieTransport,
     JWTStrategy,
 )
 from fastapi_users.db.base import BaseUserDatabase
 from pydantic import Field
 
+from .models import InputProps
 from .surreal_orm import Session, get_db
 from .tables import User
 
 
 class UserRead(schemas.BaseUser):
     trees: List[str] = Field(default_factory=lambda: list())
+    field_set_templates: List[str] = Field(default_factory=lambda: list())
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -48,7 +51,18 @@ class SurrealUsersDatabase(BaseUserDatabase[User, str]):
             raise Exception(f"Many accounts with the same email <{email}>!")
 
     async def create(self, create_dict: Dict) -> User:
-        res = await self._session.User.create(**create_dict, trees=[])
+        base_field_set = await self._session.FieldSetTemplate.create(
+            name="Base Set",
+            fields=[
+                InputProps(name="name", type="text", required=True),
+                InputProps(name="surname", type="text", required=False),
+                InputProps(name="birth-day", type="date", required=False),
+                InputProps(name="death-day", type="date", required=False),
+            ],
+        )
+        res = await self._session.User.create(
+            **create_dict, trees=[], field_set_templates=[base_field_set.id]
+        )
         await self._session.commit()
         return res
 
@@ -102,18 +116,30 @@ async def get_user_manager(
 
 
 bearer_transport = BearerTransport(tokenUrl="api/auth/jwt/login")
+cookie_transport = CookieTransport(
+    cookie_name="dev-kronikarz",
+    cookie_max_age=36000,
+    cookie_secure=False,
+    cookie_samesite="strict",
+)
 
 
 def get_jwt_strategy() -> JWTStrategy:
     return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
 
-auth_backend = AuthenticationBackend(
-    name="jwt",
+token_backend = AuthenticationBackend(
+    name="token",
     transport=bearer_transport,
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users = FastAPIUsers[User, str](get_user_manager, [auth_backend])
+cookie_backend = AuthenticationBackend(
+    name="cookie", transport=cookie_transport, get_strategy=get_jwt_strategy
+)
+
+fastapi_users = FastAPIUsers[User, str](
+    get_user_manager, [token_backend, cookie_backend]
+)
 
 current_active_user = fastapi_users.current_user(active=True)

@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw Error("No treeID!");
   }
   const api = createApiClient(token);
-  const tree = await api.data.getDetailedTreeApiTreesTreeIdGet(treeID);
+  const tree = await api.trees.getDetailedTreeApiTreesTreeIdGet(treeID);
   return json(tree);
 };
 
@@ -66,7 +66,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         children: "It is impossible to assign an empty name to a tree!",
       });
     }
-    await api.data.renameTreeApiTreesTreeIdRenamePost(
+    await api.trees.renameTreeApiTreesTreeIdRenamePost(
       treeID,
       newName as string
     );
@@ -76,7 +76,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       showGoBackButton: true,
     });
   } else if (type === "delete") {
-    await api.data.deleteTreeApiTreesTreeIdDeletePost(treeID);
+    await api.trees.deleteTreeApiTreesTreeIdDeletePost(treeID);
     return redirect("/home");
   }
 };

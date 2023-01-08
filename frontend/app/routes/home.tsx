@@ -15,6 +15,7 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { UserRead } from "src/client";
+import AppBarRight from "src/components/AppBarRight";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");
@@ -54,21 +55,7 @@ export default function () {
           >
             <Typography variant="h6">Kronikarz</Typography>
           </Box>
-          <Stack direction="row" spacing={2}>
-            <Link to=".">
-              <IconButton>
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <Link to="user">
-              <Tooltip title="User options">
-                <Avatar
-                  alt="user options"
-                  src={`https://source.boringavatars.com/beam/120/${user.id}?colors=264653,f4a261,e76f51`}
-                />
-              </Tooltip>
-            </Link>
-          </Stack>
+          <AppBarRight userID={user.id} />
         </Toolbar>
       </AppBar>
       <Box

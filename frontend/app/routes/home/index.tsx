@@ -7,7 +7,6 @@ import {
   IconButton,
   Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
@@ -23,7 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  const trees = await api.data.listMyTreesApiTreesMyGet();
+  const trees = await api.trees.listMyTreesApiTreesMyGet();
   return json(trees);
 };
 

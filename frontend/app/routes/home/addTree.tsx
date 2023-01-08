@@ -22,7 +22,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (treeName === null || treeName === "") {
     return json("Can't create a tree with no name");
   }
-  await api.data.createNewTreeApiTreesNewPost(treeName as string);
+  await api.trees.createNewTreeApiTreesNewPost(treeName as string);
   return redirect("/home");
 };
 
