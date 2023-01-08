@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict, Iterable
 
 from pydantic import BaseModel
@@ -16,6 +17,10 @@ def change_data_to_relation(data: Dict) -> Dict:
             # Every pydantic class with an id is treated as a record in the
             # database
             return value.id
+        elif isinstance(value, date):
+            # Dates need to be decoded/encoded correctly
+            return value.isoformat()
+
         elif any(isinstance(value, type) for type in [str, float, int, bool]):
             # Value is a primitive, can be passed directly
             return value
