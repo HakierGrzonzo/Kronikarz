@@ -1,5 +1,6 @@
 import {
   Accordion,
+  AccordionDetails,
   AccordionSummary,
   Alert,
   AlertTitle,
@@ -8,6 +9,11 @@ import {
   IconButton,
   Modal,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
 import { getCookie } from "~/utils/cookieUtils";
@@ -127,6 +133,26 @@ export default function FieldSets() {
                   <Delete />
                 </IconButton>
               </AccordionSummary>
+              <AccordionDetails>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Type</TableCell>
+                      <TableCell>Required?</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {set.fields.map((field, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{field.name}</TableCell>
+                        <TableCell>{field.type}</TableCell>
+                        <TableCell>{field.required ? "yes" : "no"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </AccordionDetails>
             </Accordion>
           ))}
         </Stack>
