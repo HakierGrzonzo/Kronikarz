@@ -1,8 +1,9 @@
+from datetime import date
 from typing import Dict, List, Union
 
 from pydantic import BaseModel
 
-from .models import InputProps, PartialDate
+from .models import InputProps
 from .surreal_orm import base
 from .surreal_orm.relation import RelationList
 
@@ -21,7 +22,7 @@ class Node(BaseModel):
 
 
 class RawNodeValues(BaseModel):
-    values: List[Union[None, PartialDate, float, str]]
+    values: List[Union[None, date, float, str]]
 
 
 @base.edge(Node, FieldSetTemplate)

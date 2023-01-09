@@ -1,15 +1,9 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel
 
 
-class PartialDate(BaseModel):
-    year: Optional[int]
-    month: Optional[int]
-    day: Optional[int]
-
-
 class InputProps(BaseModel):
     name: str
-    type: Literal["text", "number", "date", "file"]
+    type: Literal["text", "number", "date"]
     required: bool

@@ -1,3 +1,6 @@
+# Docker will run the app in UTC, so we use UTC during dev
+TZ=UTC
+
 .Phony: install devBackend format openapi nuke_db devFrontend prod
 
 # Install dependencies for frontend and backend

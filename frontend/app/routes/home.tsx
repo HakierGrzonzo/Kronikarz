@@ -1,21 +1,11 @@
-import {
-  AppBar,
-  Box,
-  IconButton,
-  Toolbar,
-  Typography,
-  Avatar,
-  Stack,
-  Tooltip,
-} from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
+import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import type { LoaderFunction } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import { UserRead } from "src/client";
-import AppBarRight from "src/components/AppBarRight";
+import { UserRead } from "~/client";
+import AppBarRight from "~/components/AppBarRight";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");

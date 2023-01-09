@@ -9,7 +9,6 @@ from app.users import UserRead
 
 from .surreal_orm.session import Session
 from .tables import Node, NodeRelation, NodeValues, RawNodeValues
-from .utils import debug
 
 
 def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:

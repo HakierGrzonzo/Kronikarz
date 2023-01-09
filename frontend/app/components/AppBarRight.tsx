@@ -15,7 +15,10 @@ export default function AppBarRight(props: { userID: string }) {
         <Tooltip title="User options">
           <Avatar
             alt="user options"
-            src={`https://source.boringavatars.com/beam/120/${userID}?colors=264653,f4a261,e76f51`}
+            src={`https://source.boringavatars.com/beam/120/${userID.substring(
+              6,
+              14
+            )}?colors=264653,f4a261,e76f51`}
           />
         </Tooltip>
       </Link>
