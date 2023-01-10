@@ -15,7 +15,6 @@ jobs:
           path: './backend/app'
           only-check: 'yes'
 
-jobs:
   checkExporter:
     runs-on: ubuntu-latest
     name: Check exporter code formatting
