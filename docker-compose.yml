@@ -19,6 +19,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
+    depends_on:
+      - db
+      - minio
 
   exporter:
     ports: 
@@ -28,6 +31,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.exporter
+    depends_on:
+      - backend
 
   db:
     ports:
