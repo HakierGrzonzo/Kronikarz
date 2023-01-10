@@ -2,9 +2,15 @@
 
 set -e 
 
-cd ./frontend 
+ROOT=$(pwd)
+
+cd $ROOT/frontend 
 npm run pre-commit
 
-cd ../backend
+cd $ROOT/backend
+poetry run isort . --profile black
+poetry run black -l 80 .
+
+cd $ROOT/exporter
 poetry run isort . --profile black
 poetry run black -l 80 .

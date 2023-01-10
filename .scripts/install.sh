@@ -1,9 +1,13 @@
 #!/bin/bash
 
 set -e
+ROOT=$(pwd)
 
-cd frontend
+cd $ROOT/frontend
 npm install --frozen 
 
-cd ../backend
+cd $ROOT/backend
+poetry install
+
+cd $ROOT/exporter
 poetry install

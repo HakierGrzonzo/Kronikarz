@@ -117,3 +117,6 @@ docs/*.pdf
 
 # VSCode
 .vscode/
+
+# Exporter openapi
+/exporter/app/kronikarz_backend_client/

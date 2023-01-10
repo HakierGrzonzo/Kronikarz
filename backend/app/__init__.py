@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from .field_sets import get_field_set_router
@@ -15,7 +16,14 @@ from .users import (
     token_backend,
 )
 
-app = FastAPI()
+app = FastAPI(title="Kronikarz backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")

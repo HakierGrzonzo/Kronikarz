@@ -39,6 +39,11 @@ custom backend for user authentication.
 Use the `make devBackend` command to start SurrealDB in docker and uvicorn with 
 live code reload.
 
+#### Exporter:
+
+#TODO - DOCS + openapi do frontu
+Use `make devExporter`
+
 #### `surreal_orm`:
 
 Backend uses a simple ORM for SurrealDB in the `./backend/app/surreal_orm/`

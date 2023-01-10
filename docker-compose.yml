@@ -20,6 +20,15 @@ services:
       context: .
       dockerfile: Dockerfile.backend
 
+  exporter:
+    ports: 
+      - "8002:80"
+    environment:
+      - "BACKEND=http://backend"
+    build:
+      context: .
+      dockerfile: Dockerfile.exporter
+
   db:
     ports:
       - "8001:8000"

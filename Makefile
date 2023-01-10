@@ -8,6 +8,9 @@ install:
 devBackend:
 	./.scripts/runBackend.sh
 
+# Run surreal and backend in docker and exporter with autoreloading
+devExporter:
+	./.scripts/runExporter.sh
 # Run backend and surreal in docker, run liveserver for frontend
 devFrontend:
 	./.scripts/runFrontend.sh
