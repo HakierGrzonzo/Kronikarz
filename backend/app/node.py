@@ -132,19 +132,12 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
 
         nodes = (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
-        tree = await session.Tree.select_id(tree_id)
 
-        print(nodes[0].id)
-        print( await session.Node.select_related(nodes[0].id, NodeValues))
-        print("dupa")
         data = []
         for node in nodes:
             node_values = await session.Node.select_related(node.id, NodeValues)
-            print(node_values)
             node_relations = await session.Node.select_related(node.id, NodeRelation)
-            print(node_relations)
             data.append({"node": node, "values": node_values, "relations": node_relations})
-        print(data)
         return data
 
 

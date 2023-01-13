@@ -54,6 +54,7 @@ class User(BaseModel):
     trees: RelationList[Tree]
 
 
-class AllNode(Node):
+class AllNode(BaseModel):
+    node: Node
     values: List[NodeValues]
     relations: List[NodeRelation]
