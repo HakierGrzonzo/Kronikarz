@@ -6,7 +6,7 @@ ROOT=$(pwd)
 cd $ROOT/backend 
 poetry run python -m app $ROOT/frontend/openapi.json
 
-rm -r $ROOT/exporter/app/kronikarz_backend_client
+rm -r $ROOT/exporter/app/kronikarz_backend_client || true
 cd $ROOT/exporter/app/
 poetry run openapi-python-client generate --path $ROOT/frontend/openapi.json --meta none
 
