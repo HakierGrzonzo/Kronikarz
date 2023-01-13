@@ -8,7 +8,7 @@ from app.surreal_orm import get_db
 from app.users import UserRead
 
 from .surreal_orm.session import Session
-from .tables import Node, NodeRelation, NodeValues, RawNodeValues
+from .tables import AllNode, Node, NodeRelation, NodeValues, RawNodeValues
 
 
 def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
@@ -121,11 +121,9 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
 
         return (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
-
-    # get all values for all nodes in tree and all relations
     
-    @router.get("/{tree_id}/values")
-    async def get_all_nodes_in_tree(
+    @router.get("/{tree_id}/values", response_model=List[AllNode])
+    async def get_all_values_and_relations_in_tree(
         tree_id: str,
         session: Session = Depends(get_db),
         current_user: UserRead = Depends(fastapi_users.current_user()),

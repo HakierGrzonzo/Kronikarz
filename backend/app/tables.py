@@ -52,3 +52,8 @@ class User(BaseModel):
     is_superuser: bool = False
     is_verified: bool = True
     trees: RelationList[Tree]
+
+
+class AllNode(Node):
+    values: List[NodeValues]
+    relations: List[NodeRelation]
