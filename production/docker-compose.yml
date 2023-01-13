@@ -18,7 +18,7 @@ services:
 
   db:
     restart: always
-    image: surrealdb/surrealdb:latest
+    image: surrealdb/surrealdb:1.0.0-beta.8
     command: start --log trace --user root --pass root file:///db
     volumes:
       - "/home/glusterfs/kronikarz/db:/db"
