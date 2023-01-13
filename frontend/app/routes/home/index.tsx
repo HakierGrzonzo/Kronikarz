@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import type { Tree } from "src/client";
 import { redirect, json } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Add, Edit } from "@mui/icons-material";
+import type { Tree } from "~/client";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");
