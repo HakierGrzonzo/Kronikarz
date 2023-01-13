@@ -1,4 +1,5 @@
-import { LoaderFunction, redirect, json } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";

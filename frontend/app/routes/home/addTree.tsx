@@ -6,7 +6,8 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import { ActionFunction, redirect, MetaFunction, json } from "@remix-run/node";
+import type { ActionFunction, MetaFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { Form, useTransition, Link, useActionData } from "@remix-run/react";

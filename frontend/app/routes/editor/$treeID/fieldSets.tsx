@@ -4,7 +4,6 @@ import {
   AccordionSummary,
   Alert,
   AlertTitle,
-  Box,
   Button,
   IconButton,
   Modal,
@@ -19,13 +18,9 @@ import {
 import { getCookie } from "~/utils/cookieUtils";
 import { createApiClient } from "~/createApiClient";
 
-import {
-  LoaderFunction,
-  redirect,
-  json,
-  ActionFunction,
-} from "@remix-run/node";
-import { FieldSetTemplate } from "~/client";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
+import type { FieldSetTemplate } from "~/client";
 import {
   useActionData,
   useLoaderData,

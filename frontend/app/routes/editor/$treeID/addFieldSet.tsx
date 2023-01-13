@@ -17,10 +17,11 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { ActionFunction, json, redirect } from "@remix-run/node";
+import type { ActionFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { useState } from "react";
-import { FieldSetTemplate, InputProps } from "~/client";
+import type { FieldSetTemplate, InputProps } from "~/client";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 

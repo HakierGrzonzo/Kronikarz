@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import { Tree } from "src/client";
+import type { Tree } from "src/client";
 import { redirect, json } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";

@@ -1,5 +1,6 @@
 import { AppClient } from "./client";
-import { decode, JwtPayload } from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 import { isPast, millisecondsInSecond } from "date-fns";
 import { redirect } from "@remix-run/node";
 import { cookieMaker, deleteCookie } from "./utils/cookieUtils";

@@ -1,12 +1,11 @@
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import {
+import type {
   LoaderFunction,
-  redirect,
-  json,
   ActionFunction,
   MetaFunction,
 } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import {
   Form,
   useLoaderData,
@@ -14,7 +13,8 @@ import {
   useActionData,
   useNavigate,
 } from "@remix-run/react";
-import { Tree } from "~/client";
+import type { Tree } from "~/client";
+import type { AlertProps } from "@mui/material";
 import {
   Typography,
   Stack,
@@ -24,7 +24,6 @@ import {
   Modal,
   Alert,
   AlertTitle,
-  AlertProps,
 } from "@mui/material";
 import { useState } from "react";
 

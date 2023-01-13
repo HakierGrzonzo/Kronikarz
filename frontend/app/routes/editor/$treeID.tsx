@@ -9,7 +9,8 @@ import {
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PolylineIcon from "@mui/icons-material/Polyline";
-import { LoaderFunction, redirect, json } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { useLoaderData, Link, Outlet, useMatches } from "@remix-run/react";
 import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
@@ -29,11 +30,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 const pages = {
-  ["Tree View"]: { icon: PolylineIcon, path: "." },
-  ["People View"]: { icon: Diversity3Icon, path: "./people" },
-  ["Add new Person"]: { icon: PersonAddAlt1Icon, path: "./addPerson" },
-  ["My Field Sets"]: { icon: Reorder, path: "./fieldSets" },
-  ["Create new Field set"]: { icon: PlaylistAdd, path: "./addFieldSet" },
+  "Tree View": { icon: PolylineIcon, path: "." },
+  "People View": { icon: Diversity3Icon, path: "./people" },
+  "Add new Person": { icon: PersonAddAlt1Icon, path: "./addPerson" },
+  "My Field Sets": { icon: Reorder, path: "./fieldSets" },
+  "Create new Field set": { icon: PlaylistAdd, path: "./addFieldSet" },
 };
 
 export default function Editor() {

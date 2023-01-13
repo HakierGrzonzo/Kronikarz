@@ -1,10 +1,11 @@
 import { Box } from "@mui/material";
-import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-
-import { LoaderFunction, redirect, json } from "@remix-run/node";
+import type { GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Node } from "src/client";
-import { FieldSetTemplate, InputProps, NodeValues } from "~/client";
+import type { Node } from "src/client";
+import type { FieldSetTemplate, InputProps, NodeValues } from "~/client";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 

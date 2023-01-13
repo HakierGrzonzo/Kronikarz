@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,

@@ -16,16 +16,12 @@ import {
   IconButton,
 } from "@mui/material";
 
-import {
-  LoaderFunction,
-  redirect,
-  json,
-  ActionFunction,
-} from "@remix-run/node";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { useEffect, useState } from "react";
-import { FieldSetTemplate, RawNodeValues } from "~/client";
+import type { FieldSetTemplate, RawNodeValues } from "~/client";
 import { Delete, ExpandMore } from "@mui/icons-material";
 
 export const loader: LoaderFunction = async ({ request, params }) => {

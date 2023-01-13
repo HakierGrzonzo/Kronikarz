@@ -4,7 +4,7 @@ import { redirect, json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import { UserRead } from "~/client";
+import type { UserRead } from "~/client";
 import AppBarRight from "~/components/AppBarRight";
 
 export const loader: LoaderFunction = async ({ request }) => {
