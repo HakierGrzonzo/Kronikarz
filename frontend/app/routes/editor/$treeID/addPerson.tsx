@@ -96,7 +96,7 @@ export default function AddNewPerson() {
                       {fieldSet.fields.map((field, index) => (
                         <TextField
                           key={index}
-                          label={field.name}
+                          label={field.type == "date" ? undefined : field.name}
                           type={field.type}
                           name={`${fieldSet.id}-${index}`}
                           required={field.required}
