@@ -122,6 +122,34 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         return (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
 
+    # get all values for all nodes in tree and all relations
+    
+    @router.get("/{tree_id}/values")
+    async def get_all_nodes_in_tree(
+        tree_id: str,
+        session: Session = Depends(get_db),
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+    ):
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        nodes = (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
+        tree = await session.Tree.select_id(tree_id)
+
+        print(nodes[0].id)
+        print( await session.Node.select_related(nodes[0].id, NodeValues))
+        print("dupa")
+        data = []
+        for node in nodes:
+            node_values = await session.Node.select_related(node.id, NodeValues)
+            print(node_values)
+            node_relations = await session.Node.select_related(node.id, NodeRelation)
+            print(node_relations)
+            data.append({"node": node, "values": node_values, "relations": node_relations})
+        print(data)
+        return data
+
+
     @router.get("/{tree_id}/{node_id}", response_model=Node)
     async def get_one_node(
         tree_id: str,
