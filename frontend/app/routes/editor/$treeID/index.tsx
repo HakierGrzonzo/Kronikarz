@@ -14,9 +14,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const api = createApiClient(token);
   const { treeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
-  const data = await api.nodes.getAllValuesAndRelationsInTreeApiNodesTreeIdValuesGet(
-    treeID
-  );
+  const data =
+    await api.nodes.getAllValuesAndRelationsInTreeApiNodesTreeIdValuesGet(
+      treeID
+    );
   return json(data);
 };
 
