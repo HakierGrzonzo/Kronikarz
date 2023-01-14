@@ -5,6 +5,7 @@ import type { AllNode } from "~/client";
 import { useState } from "react";
 import { randomAvatar } from "~/utils/image";
 import { useFetcher } from "@remix-run/react";
+import { Box, Typography } from "@mui/material";
 
 function EditEdgeWithoutDrag({
   shouldDisplay,
@@ -71,7 +72,19 @@ export default function VisNetwork({
   token: string;
 }) {
   const fetcher = useFetcher();
-  if (!data) return null;
+  if (!data || data.length === 0) return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <Typography variant="h4">No data for this tree</Typography>
+    </Box>
+  );
 
   const nodes = data.map((node) => {
     return {
@@ -138,22 +151,12 @@ export default function VisNetwork({
                 { method: "post", replace: true }
               );
             },
-            // addNode: function (data: any, callback: any) {
-            //     editNode(data, clearNodePopUp, callback);
-            // },
-            // editNode: function (data: any, callback: any) {
-            //     setIsEditing(true);
-            //     setCurrent(data);
-            //     console.log("edit edge");
-            // },
-            // addEdge: true,
-            // editEdge: function (data: any, callback: any) {
-            //     setIsEditing(true);
-            //     setCurrent(data);
-            //     console.log("edit edge");
-            // },
-            // deleteNode: true,
-            // deleteEdge: true,
+            deleteEdge: function (data: any, callback: any) {
+              fetcher.submit(
+                { treeID, nodeID: data.nodes[0], type: "deleteEdge" },
+                { method: "post", replace: true }
+              );
+            }
           },
         }
       );

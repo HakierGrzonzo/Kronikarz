@@ -56,6 +56,7 @@ export default function PeopleView() {
     .map((field: InputProps & { set: FieldSetTemplate; index: number }) => ({
       field: `${field.set.id}-${field.index}`,
       headerName: field.name,
+      width: 150,
     }));
   const gridRows: GridRowsProp = values.map(
     (nodeAndValues: { node: Node; value: NodeValues[] }) => {
