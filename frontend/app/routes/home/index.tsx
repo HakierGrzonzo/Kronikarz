@@ -15,6 +15,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Add, Edit } from "@mui/icons-material";
 import type { Tree } from "~/client";
+import { useImageUrl } from "~/utils/image";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");
@@ -28,6 +29,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function () {
   const trees = useLoaderData() as Tree[];
+  const getImageUrl = useImageUrl();
   return (
     <Stack direction="column" spacing={2} sx={{ maxWidth: "100%" }}>
       <Typography variant="h3">Your family trees:</Typography>

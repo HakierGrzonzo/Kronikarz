@@ -5,8 +5,8 @@
     "build": "remix build",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "openapi": "openapi --input http://localhost:8000/openapi.json --output ./app/client --client fetch --name AppClient",
-    "openprod": "openapi --input ./openapi.json --output ./app/client --client fetch --name AppClient",
+    "openapi": "openapi --input http://localhost:8000/openapi.json --output ./app/client --client fetch --name AppClient --request ./openapiRequest.ts",
+    "openprod": "openapi --input ./openapi.json --output ./app/client --client fetch --name AppClient --request ./openapiRequest.ts",
     "pre-commit": "prettier -w ."
   },
   "dependencies": {
