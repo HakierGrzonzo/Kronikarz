@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import {
   Box,
   Stack,
@@ -23,6 +23,7 @@ import { getCookie } from "~/utils/cookieUtils";
 import { useEffect, useState } from "react";
 import type { FieldSetTemplate, NodeValues, RawNodeValues } from "~/client";
 import { Delete, ExpandMore } from "@mui/icons-material";
+import Feedback from "~/components/Feedback";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -36,11 +37,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const dateRegex = new RegExp("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$");
 
-  const resp = await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
+  const valuesResp = await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
     treeID,
     nodeID
   );
-  const data = resp.map((node) => {
+
+
+  const baseResp = await api.nodes.getOneNodeApiNodesTreeIdNodeIdGet(
+    treeID,
+    nodeID
+  );
+
+  const data = valuesResp.map((node) => {
     return {
       values: node.values.map((value) => {
         if (dateRegex.test(value)) {
@@ -55,13 +63,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   });
 
   const fields = await api.fields.getMyFieldsetsApiFieldsMyGet();
-  return json([data, fields]);
+  return json([baseResp, data, fields]);
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
   const data = await request.formData();
   const values: Record<string, RawNodeValues> = {};
   for (const key of data.keys()) {
+    if (key.startsWith("base")) continue;
     const [fieldSet, index] = key.split("-");
     const arr = values[fieldSet] || { values: [] };
     const value = data.get(key);
@@ -73,16 +82,26 @@ export const action: ActionFunction = async ({ request, params }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  console.log(values);
-  const { treeID } = params;
-  if (treeID === undefined) throw Error("treeID not given");
-  //TODO: when there will be endpoints for editing nodes, use them here instead of creating a new one
-  await api.nodes.createNewNodeApiNodesNewTreeIdPost(treeID, values);
-  return "success";
+  const { treeID, nodeID } = params;
+  if (!treeID) throw Error("treeID not given");
+  if (!nodeID) throw Error("nodeID not given");
+  const name = data.get("base-name") as string;
+  const surname = data.get("base-surname") as string;
+  const result = await api.nodes.editNodeApiNodesTreeIdNodeIdPost(treeID, nodeID, {
+    name,
+    surname,
+  });
+
+  await Promise.all(
+    Object.entries(values).map(([key, value]) => {
+      api.nodes.editNodeValuesApiNodesTreeIdNodeIdFieldSetIdPost(treeID, nodeID, key, value);
+    })
+  );
+  return json(result);
 };
 
 export default function EditPerson() {
-  const [data, fields] = useLoaderData<[NodeValues[], FieldSetTemplate[]]>();
+  const [baseResp, data, fields] = useLoaderData<[Node, NodeValues[], FieldSetTemplate[]]>();
   const allCurrentFieldSets = data.map((d) => d.out?.id);
   const [fieldSetToAdd, setFieldSetToAdd] = useState<string>("no-value");
   const [selectedFields, setFields] = useState<string[]>(allCurrentFieldSets);
@@ -92,11 +111,23 @@ export default function EditPerson() {
     // When the selectedFields changes, we reset the select
     setFieldSetToAdd("no-value");
   }, [selectedFields]);
+  const lastPerson = useActionData();
+
 
   return (
     <Box sx={{ padding: 1, width: "100%" }}>
+      {lastPerson && (
+        <Feedback
+          msg={`Succesfully added ${lastPerson.name}!`}
+          severity="success"
+        />
+      )}
       <Typography variant="h3">Edit person</Typography>
       <Form replace method="post">
+        <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
+          <TextField name="base-name" label="Name" defaultValue={baseResp.name} required />
+          <TextField name="base-surname" label="Surname" defaultValue={baseResp.surname} required />
+        </Stack>
         {selectedFields
           .map((fieldSetId) => fields.find((f) => f.id === fieldSetId))
           .map(
@@ -140,7 +171,6 @@ export default function EditPerson() {
           type="submit"
           variant="contained"
           sx={{ marginTop: 1 }}
-          disabled={selectedFields.length === 0}
         >
           Save changes
         </Button>
