@@ -121,7 +121,7 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
 
         return (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
-    
+
     @router.get("/{tree_id}/values", response_model=List[AllNode])
     async def get_all_values_and_relations_in_tree(
         tree_id: str,
@@ -136,10 +136,17 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         data = []
         for node in nodes:
             node_values = await session.Node.select_related(node.id, NodeValues)
-            node_relations = await session.Node.select_related(node.id, NodeRelation)
-            data.append({"node": node, "values": node_values, "relations": node_relations})
+            node_relations = await session.Node.select_related(
+                node.id, NodeRelation
+            )
+            data.append(
+                {
+                    "node": node,
+                    "values": node_values,
+                    "relations": node_relations,
+                }
+            )
         return data
-
 
     @router.get("/{tree_id}/{node_id}", response_model=Node)
     async def get_one_node(
