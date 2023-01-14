@@ -3,6 +3,8 @@ import { useRef, useEffect } from "react";
 import { Network } from "vis-network";
 import type { AllNode } from "~/client";
 import { useState } from "react";
+import { randomAvatar } from "~/utils/image";
+import { useFetcher } from "@remix-run/react";
 
 function EditEdgeWithoutDrag({
   shouldDisplay,
@@ -51,17 +53,31 @@ function EditEdgeWithoutDrag({
   );
 }
 
-const img = (id: string) =>
-  `https://source.boringavatars.com/beam/120/${id.substring(6, 14)}`;
+// function deleteNode(treeID: string, nodeID: string, token: string) {
+//     const api = createApiClient(token);
+//     api.nodes.deleteNodeApiNodesTreeIdNodeIdDeletePost(
+//         treeID,
+//         nodeID
+//     );
+// }
 
-export default function VisNetwork({ data }: { data: AllNode[] }) {
+export default function VisNetwork({
+  data,
+  treeID,
+  token,
+}: {
+  data: AllNode[];
+  treeID: string;
+  token: string;
+}) {
+  const fetcher = useFetcher();
   if (!data) return null;
 
   const nodes = data.map((node) => {
     return {
       id: node.node.id,
       label: node.values[0].values[0] || node.node.id,
-      image: img(node.node.id),
+      image: randomAvatar(node.node.id),
       shape: "circularImage",
     };
   });
@@ -105,10 +121,22 @@ export default function VisNetwork({ data }: { data: AllNode[] }) {
           interaction: { hover: true },
           manipulation: {
             enabled: true,
+            addNode: false,
             deleteNode: function (data: any, callback: any) {
-              console.log("delete node");
-              console.log(data);
+              fetcher.submit(
+                { treeID, nodeID: data.nodes[0], type: "delete" },
+                { method: "post", replace: true }
+              );
               callback(data);
+            },
+            editNode: function (data: any, callback: any) {
+              window.location.href = `/editor/${treeID}/${data.id}`;
+            },
+            addEdge: function (data: any, callback: any) {
+              fetcher.submit(
+                { treeID, nodeID: data.nodes[0], type: "addEdge" },
+                { method: "post", replace: true }
+              );
             },
             // addNode: function (data: any, callback: any) {
             //     editNode(data, clearNodePopUp, callback);
@@ -129,9 +157,10 @@ export default function VisNetwork({ data }: { data: AllNode[] }) {
           },
         }
       );
-    network?.on("selectNode", (event: { nodes: string[] }) => {
+    network?.on("oncontext", (event: any) => {
+      event.event.preventDefault();
       if (event.nodes?.length === 1) {
-        window.location.href = event.nodes[0];
+        window.location.href = `/editor/${treeID}/${event.nodes[0]}`;
       }
     });
   }, [visJsRef, nodes, edges]);
