@@ -76,7 +76,7 @@ export default function VisNetwork({
   const nodes = data.map((node) => {
     return {
       id: node.node.id,
-      label: node?.values[0]?.values[0] || node.node.id,
+      label: `${node.node.name} ${node.node.surname}`,
       image: randomAvatar(node.node.id),
       shape: "circularImage",
     };

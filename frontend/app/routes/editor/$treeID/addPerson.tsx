@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import {
   Box,
   Stack,
@@ -23,6 +23,7 @@ import { getCookie } from "~/utils/cookieUtils";
 import { useEffect, useState } from "react";
 import type { FieldSetTemplate, RawNodeValues } from "~/client";
 import { Delete, ExpandMore } from "@mui/icons-material";
+import Feedback from "~/components/Feedback";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -40,6 +41,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const data = await request.formData();
   const values: Record<string, RawNodeValues> = {};
   for (const key of data.keys()) {
+    if (key.startsWith("base")) continue;
     const [fieldSet, index] = key.split("-");
     const arr = values[fieldSet] || { values: [] };
     const value = data.get(key);
@@ -51,11 +53,17 @@ export const action: ActionFunction = async ({ request, params }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  console.log(values);
   const { treeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
-  await api.nodes.createNewNodeApiNodesNewTreeIdPost(treeID, values);
-  return "success";
+  const name = data.get("base-name") as string;
+  const surname = data.get("base-surname") as string;
+  const result = await api.nodes.createNewNodeApiNodesNewTreeIdPost(
+    treeID,
+    name,
+    surname,
+    values
+  );
+  return json(result);
 };
 
 export default function AddNewPerson() {
@@ -66,11 +74,22 @@ export default function AddNewPerson() {
     // When the selectedFields changes, we reset the select
     setFieldSetToAdd("no-value");
   }, [selectedFields]);
+  const lastPerson = useActionData();
 
   return (
     <Box sx={{ padding: 1, width: "100%" }}>
+      {lastPerson && (
+        <Feedback
+          msg={`Succesfully added ${lastPerson.name}!`}
+          severity="success"
+        />
+      )}
       <Typography variant="h3">Add a new person</Typography>
-      <Form replace method="post">
+      <Form reloadDocument method="post">
+        <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
+          <TextField name="base-name" label="Name" required />
+          <TextField name="base-surname" label="Surname" required />
+        </Stack>
         {selectedFields
           .map((fieldSetId) => fields.find((f) => f.id === fieldSetId))
           .map(
@@ -107,12 +126,7 @@ export default function AddNewPerson() {
                 </Accordion>
               )
           )}
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ marginTop: 1 }}
-          disabled={selectedFields.length === 0}
-        >
+        <Button type="submit" variant="contained" sx={{ marginTop: 1 }}>
           Add new person
         </Button>
       </Form>

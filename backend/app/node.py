@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_users import FastAPIUsers
@@ -8,7 +8,14 @@ from app.surreal_orm import get_db
 from app.users import UserRead
 
 from .surreal_orm.session import Session
-from .tables import AllNode, Node, NodeRelation, NodeValues, RawNodeValues
+from .tables import (
+    AllNode,
+    Node,
+    NodeRelation,
+    NodeValues,
+    RawNode,
+    RawNodeValues,
+)
 
 
 def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
@@ -18,6 +25,8 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
     async def create_new_node(
         tree_id: str,
         node_values: Dict[str, RawNodeValues],
+        name: str,
+        surname: Optional[str],
         session: Session = Depends(get_db),
         current_user: UserRead = Depends(fastapi_users.current_user()),
     ):
@@ -29,6 +38,9 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         node, tree = await asyncio.gather(
             session.Node.create(
+                name=name,
+                surname=surname,
+                cover_photo=None,
                 files=list(),
             ),
             session.Tree.select_id(tree_id),
@@ -187,10 +199,30 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             session.Node.delete(node_id),
         )
 
+    @router.post("/{tree_id}/{node_id}", response_model=Node)
+    async def edit_node(
+        tree_id: str,
+        node_id: str,
+        values: RawNode,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        session: Session = Depends(get_db),
+    ):
+        "Editing node"
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        tree = await session.Tree.select_id(tree_id)
+        if node_id not in tree.nodes:
+            raise HTTPException(404, "Node not found!")
+
+        res = await session.Node.patch(node_id, **values.dict())
+        await session.commit()
+        return res
+
     @router.post(
         "/{tree_id}/{node_id}/{field_set_id}", response_model=NodeValues
     )
-    async def edit_node(
+    async def edit_node_values(
         tree_id: str,
         node_id: str,
         field_set_id: str,

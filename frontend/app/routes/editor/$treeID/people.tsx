@@ -34,6 +34,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json({ fields, values });
 };
 
+const base_columns: GridColDef[] = [
+  {
+    field: "name",
+  },
+  {
+    field: "surname",
+  },
+];
+
 export default function PeopleView() {
   const { fields, values } = useLoaderData();
   const gridColumns: GridColDef[] = fields
@@ -53,6 +62,8 @@ export default function PeopleView() {
       const { node, value } = nodeAndValues;
       return {
         id: node.id,
+        name: node.name,
+        surname: node.surname,
         ...Object.fromEntries(
           value.flatMap((nodeValue) => {
             return nodeValue.values.map((v, index) => [
@@ -77,7 +88,7 @@ export default function PeopleView() {
         experimentalFeatures={{ columnGrouping: true }}
         columnGroupingModel={columnGrouping}
         rows={gridRows}
-        columns={gridColumns}
+        columns={[...base_columns, ...gridColumns]}
       />
     </Box>
   );
