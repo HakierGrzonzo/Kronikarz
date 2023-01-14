@@ -180,8 +180,8 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         if node_id not in tree.nodes:
             raise HTTPException(404, "Node not found!")
         await asyncio.gather(
-            session.User.patch(
-                current_user.id,
+            session.Tree.patch(
+                tree_id,
                 nodes=[node for node in tree.nodes if node != node_id],
             ),
             session.Node.delete(node_id),
