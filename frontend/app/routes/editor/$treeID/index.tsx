@@ -28,14 +28,47 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
   const api = createApiClient(token);
   const data = await request.formData();
-  console.log(data.get("treeID"));
-  const treeID = data.get("treeID") as string;
-  const nodeID = data.get("nodeID") as string;
-  if (!treeID) throw Error("treeID not given");
-  if (!nodeID) throw Error("nodeID not given");
-  await api.nodes.deleteNodeApiNodesTreeIdNodeIdDeletePost(treeID, nodeID);
-
-  return "success";
+  if (data.get("type") === "deleteNode") {
+    const treeID = data.get("treeID") as string;
+    const nodeID = data.get("nodeID") as string;
+    if (!treeID) throw Error("treeID not given");
+    if (!nodeID) throw Error("nodeID not given");
+    await api.nodes.deleteNodeApiNodesTreeIdNodeIdDeletePost(treeID, nodeID);
+    return "success";
+  }
+  if (data.get("type") === "addEdge") {
+    const treeID = data.get("treeID") as string;
+    const from = data.get("from") as string;
+    const to = data.get("to") as string;
+    const label = data.get("label") as string;
+    const startDate = data.get("startDate") as string;
+    const endDate = data.get("endDate") as string;
+    if (!treeID) throw Error("treeID not given");
+    if (!from) throw Error("from not given");
+    if (!to) throw Error("to not given");
+    await api.nodes.linkNodesApiNodesRelationTreeIdLinkInNodeIdOutNodeIdPost(
+      treeID,
+      from,
+      to,
+      label,
+      {
+        start_date: startDate,
+        end_date: endDate,
+      }
+    );
+    return "success";
+  }
+  // TODO: implement when backend is ready
+  // if (data.get("type") === "deleteEdge") {
+  //   const treeID = data.get("treeID") as string;
+  //   const from = data.get("from") as string;
+  //   const to = data.get("to") as string;
+  //   if (!treeID) throw Error("treeID not given");
+  //   if (!from) throw Error("from not given");
+  //   if (!to) throw Error("to not given");
+  //   await api.nodes.de(treeID, from, to);
+  //   return "success";
+  // }
 };
 
 export default function TreeView() {

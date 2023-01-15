@@ -6,61 +6,7 @@ import { useState } from "react";
 import { randomAvatar } from "~/utils/image";
 import { useFetcher } from "@remix-run/react";
 import { Box, Typography } from "@mui/material";
-
-function EditEdgeWithoutDrag({
-  shouldDisplay,
-  data,
-  cancel,
-  callback,
-}: {
-  shouldDisplay: boolean;
-  data?: any;
-  cancel?: any;
-  callback?: any;
-}) {
-  console.log(shouldDisplay);
-  if (!shouldDisplay) return null;
-  const [edgeData, setEdgeData] = useState(data);
-  console.log(data);
-  console.log("test");
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    callback(edgeData);
-    cancel();
-  };
-
-  const handleInputChange = (e: any) => {
-    setEdgeData({
-      ...edgeData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Label:
-        <input
-          type="text"
-          name="label"
-          value={edgeData.label}
-          onChange={handleInputChange}
-        />
-      </label>
-      <br />
-      <button type="submit">Save</button>
-      <button onClick={cancel}>Cancel</button>
-    </form>
-  );
-}
-
-// function deleteNode(treeID: string, nodeID: string, token: string) {
-//     const api = createApiClient(token);
-//     api.nodes.deleteNodeApiNodesTreeIdNodeIdDeletePost(
-//         treeID,
-//         nodeID
-//     );
-// }
+import ModalForm from "./ModalForm";
 
 export default function VisNetwork({
   data,
@@ -72,19 +18,20 @@ export default function VisNetwork({
   token: string;
 }) {
   const fetcher = useFetcher();
-  if (!data || data.length === 0) return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-        width: "100%",
-      }}
-    >
-      <Typography variant="h4">No data for this tree</Typography>
-    </Box>
-  );
+  if (!data || data.length === 0)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <Typography variant="h4">No data for this tree</Typography>
+      </Box>
+    );
 
   const nodes = data.map((node) => {
     return {
@@ -97,27 +44,18 @@ export default function VisNetwork({
   const edges = data.flatMap((node) => {
     return node.relations.map((relation) => {
       return {
+        id: relation.id,
         from: node.node.id,
         to: relation.out.id,
         label: relation.relation_type,
       };
     });
   });
-  const [isEditing, setIsEditing] = useState(false);
   const [current, setCurrent] = useState<any>(null);
 
-  const clearNodePopUp = () => {
-    setIsEditing(false);
-  };
-
-  const cancelNodeEdit = () => {
-    setIsEditing(false);
-    // additional logic to revert changes or reset data
-  };
-
-  const clearEdgePopUp = () => {
-    setIsEditing(false);
-  };
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const visJsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -136,27 +74,32 @@ export default function VisNetwork({
             enabled: true,
             addNode: false,
             deleteNode: function (data: any, callback: any) {
+              callback(data);
               fetcher.submit(
-                { treeID, nodeID: data.nodes[0], type: "delete" },
+                { treeID, nodeID: data.nodes[0], type: "deleteNode" },
                 { method: "post", replace: true }
               );
-              callback(data);
             },
             editNode: function (data: any, callback: any) {
               window.location.href = `/editor/${treeID}/${data.id}`;
             },
             addEdge: function (data: any, callback: any) {
-              fetcher.submit(
-                { treeID, nodeID: data.nodes[0], type: "addEdge" },
-                { method: "post", replace: true }
-              );
+              setCurrent(data);
+              handleOpen();
+              callback(data);
             },
             deleteEdge: function (data: any, callback: any) {
-              fetcher.submit(
-                { treeID, nodeID: data.nodes[0], type: "deleteEdge" },
-                { method: "post", replace: true }
-              );
-            }
+              setCurrent(data);
+              console.log(data);
+              // find in edges data.edges[0]
+              console.log(edges.find((edge) => edge.id === data.edges[0]));
+              callback(data);
+              // TODO: when backend is ready connect this
+              // fetcher.submit(
+              //   { treeID, nodeID: data.nodes[0], type: "deleteEdge" },
+              //   { method: "post", replace: true }
+              // );
+            },
           },
         }
       );
@@ -170,11 +113,11 @@ export default function VisNetwork({
 
   return (
     <>
-      <EditEdgeWithoutDrag
-        shouldDisplay={isEditing}
-        data={current}
-        callback={() => console.log("test")}
-        cancel={cancelNodeEdit}
+      <ModalForm
+        treeID={treeID}
+        current={current}
+        open={open}
+        handleClose={handleClose}
       />
       <div
         ref={visJsRef}
