@@ -15,7 +15,6 @@ export default function VisNetwork({
   data: AllNode[];
   treeID: string;
 }) {
-
   const dateShower = (startDate: string, endDate: string) => {
     startDate = startDate.split("T")[0];
     endDate = endDate.split("T")[0];
@@ -28,7 +27,7 @@ export default function VisNetwork({
     } else {
       return undefined;
     }
-  }
+  };
 
   if (!data || data.length === 0)
     return (
@@ -63,7 +62,7 @@ export default function VisNetwork({
         to: relation.out.id,
         label: relation.relation_type,
         arrows: relation.relation_type === "małżeństwo" ? undefined : "to",
-        title: dateShower(relation.props.start_date, relation.props.end_date)
+        title: dateShower(relation.props.start_date, relation.props.end_date),
       };
     });
   });
