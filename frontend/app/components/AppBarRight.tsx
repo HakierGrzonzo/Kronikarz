@@ -1,6 +1,7 @@
 import { Stack, IconButton, Tooltip, Avatar } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "@remix-run/react";
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 
 export default function AppBarRight(props: { userID: string }) {
   const { userID } = props;
@@ -9,6 +10,11 @@ export default function AppBarRight(props: { userID: string }) {
       <Link to="/home">
         <IconButton>
           <HomeIcon />
+        </IconButton>
+      </Link>
+      <Link to="/login">
+        <IconButton>
+          <MeetingRoomIcon />
         </IconButton>
       </Link>
       <Link to="/user">

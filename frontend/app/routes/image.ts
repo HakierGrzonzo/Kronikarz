@@ -1,6 +1,7 @@
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
-import { LoaderFunction, redirect, Response } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect, Response } from "@remix-run/node";
 export const loader: LoaderFunction = async ({ request }) => {
   const token = getCookie(request, "token");
   if (!token) {
@@ -27,8 +28,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   return new Response(await response.blob(), {
     status: 200,
     headers: {
-      ["Cache-Control"]: response.headers.get("Cache-Control") as string,
-      ["Content-Type"]: response.headers.get("Content-Type") as string,
+      "Cache-Control": response.headers.get("Cache-Control") as string,
+      "Content-Type": response.headers.get("Content-Type") as string,
     },
   });
 };
