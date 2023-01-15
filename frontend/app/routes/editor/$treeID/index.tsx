@@ -28,6 +28,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
   const api = createApiClient(token);
   const data = await request.formData();
+
   if (data.get("type") === "deleteNode") {
     const treeID = data.get("treeID") as string;
     const nodeID = data.get("nodeID") as string;
@@ -36,6 +37,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     await api.nodes.deleteNodeApiNodesTreeIdNodeIdDeletePost(treeID, nodeID);
     return "success";
   }
+
   if (data.get("type") === "addEdge") {
     const treeID = data.get("treeID") as string;
     const from = data.get("from") as string;

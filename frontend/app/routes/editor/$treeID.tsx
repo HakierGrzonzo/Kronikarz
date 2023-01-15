@@ -17,9 +17,7 @@ import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { PlaylistAdd, Reorder } from "@mui/icons-material";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { ExportHandler } from "~/utils/Export";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -30,7 +28,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const { treeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
   const user = await api.users.usersCurrentUserApiUsersMeGet();
-  return json(user);
+  const data =
+    await api.nodes.getAllValuesAndRelationsInTreeApiNodesTreeIdValuesGet(
+      treeID
+    );
+  return json([user, data]);
 };
 
 const pages = {
@@ -52,6 +54,18 @@ export default function Editor() {
     }
   }
 
+  const exportDataAsJson = (data: any) => {
+    const json = JSON.stringify(data);
+    const blob = new Blob([json], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = "data.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const exportDataAsImg = () => {
     if (document !== undefined) {
       const canvas = document.getElementsByTagName("canvas")[0];
@@ -71,7 +85,6 @@ export default function Editor() {
   const exportDataAsPDF = () => {
     if (document !== undefined) {
       const canvas = document.getElementsByTagName("canvas")[0];
-      // export as pdf
       const pdf = new jsPDF();
       pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
       pdf.save("canvas.pdf");
@@ -99,7 +112,7 @@ export default function Editor() {
     }
   };
 
-  const user = useLoaderData();
+  const [user, data] = useLoaderData();
   const matches = useMatches();
   const currentPageID =
     matches.find((match) => !!pages[match.handle as unknown as string])
@@ -125,6 +138,11 @@ export default function Editor() {
                   </Tooltip>
                 </Link>
               ))}
+              <Tooltip title="Export as json">
+                <IconButton onClick={() => exportDataAsJson(data)}>
+                  <GetAppIcon />
+                </IconButton>
+              </Tooltip>
               {displayExport && (
                 <Tooltip title="Export as img">
                   <IconButton onClick={exportDataAsImg}>

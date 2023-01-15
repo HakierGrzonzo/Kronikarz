@@ -15,7 +15,6 @@ export default function VisNetwork({
   data: AllNode[];
   treeID: string;
 }) {
-  const fetcher = useFetcher();
   if (!data || data.length === 0)
     return (
       <Box
@@ -30,6 +29,8 @@ export default function VisNetwork({
         <Typography variant="h4">No data for this tree</Typography>
       </Box>
     );
+
+  const fetcher = useFetcher();
 
   const nodes = data.map((node) => {
     return {
