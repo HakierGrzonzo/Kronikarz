@@ -16,6 +16,10 @@ import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { PlaylistAdd, Reorder } from "@mui/icons-material";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { ExportHandler } from "~/utils/Export";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -38,6 +42,63 @@ const pages = {
 };
 
 export default function Editor() {
+  let displayExport = false;
+  if (typeof window !== "undefined") {
+    if (
+      window?.location?.pathname?.split("/")[1] === "editor" &&
+      window?.location?.pathname?.split("/")[3] === undefined
+    ) {
+      displayExport = true;
+    }
+  }
+
+  const exportDataAsImg = () => {
+    if (document !== undefined) {
+      const canvas = document.getElementsByTagName("canvas")[0];
+      const image = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+
+      const link = document.createElement("a");
+      link.id = "download";
+      link.download = "image.png";
+      link.href = image;
+      link.click();
+      document.getElementById("download")?.remove();
+    }
+  };
+
+  const exportDataAsPDF = () => {
+    if (document !== undefined) {
+      const canvas = document.getElementsByTagName("canvas")[0];
+      // export as pdf
+      const pdf = new jsPDF();
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
+      pdf.save("canvas.pdf");
+    }
+  };
+
+  const exportDataAsHTML = () => {
+    if (document !== undefined) {
+      const canvas = document.getElementsByTagName("canvas")[0];
+      const image = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
+      const htmlPageWithImage = `
+      <html>
+        <head>
+          <title>Image</title>
+        </head>
+        <body>
+          <img src="${image}" />
+        </body>
+      </html>
+      `;
+      let blob = new Blob([htmlPageWithImage], { type: "text/html" });
+      window.open(URL.createObjectURL(blob));
+    }
+  };
+
   const user = useLoaderData();
   const matches = useMatches();
   const currentPageID =
@@ -64,6 +125,27 @@ export default function Editor() {
                   </Tooltip>
                 </Link>
               ))}
+              {displayExport && (
+                <Tooltip title="Export as img">
+                  <IconButton onClick={exportDataAsImg}>
+                    <GetAppIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {displayExport && (
+                <Tooltip title="Export as pdf">
+                  <IconButton onClick={exportDataAsPDF}>
+                    <GetAppIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {displayExport && (
+                <Tooltip title="Export as html">
+                  <IconButton onClick={exportDataAsHTML}>
+                    <GetAppIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Stack>
             <AppBarRight userID={user.id} />
           </Stack>

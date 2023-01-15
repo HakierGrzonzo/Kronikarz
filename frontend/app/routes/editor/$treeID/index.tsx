@@ -72,8 +72,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function TreeView() {
-  const [data, treeID, token] = useLoaderData() as [AllNode[], string, string];
-  return <VisNetwork data={data} treeID={treeID} token={token} />;
+  const [data, treeID] = useLoaderData() as [AllNode[], string, string];
+  return <VisNetwork data={data} treeID={treeID} />;
 }
 
 export const handle = "Tree View";

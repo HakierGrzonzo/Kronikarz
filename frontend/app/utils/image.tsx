@@ -1,7 +1,9 @@
 import { useHref } from "@remix-run/react";
 
-export const randomAvatar = (id: string) =>
-  `https://source.boringavatars.com/beam/120/${id.substring(6, 14)}`;
+export const randomAvatar = (id: string) => {
+  const name = `av${Math.floor(Math.random() * 10)}.svg`;
+  return `/avatars/${name}`;
+};
 
 export function useFileUrl() {
   const base = useHref("/file");

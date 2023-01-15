@@ -11,11 +11,9 @@ import ModalForm from "./ModalForm";
 export default function VisNetwork({
   data,
   treeID,
-  token,
 }: {
   data: AllNode[];
   treeID: string;
-  token: string;
 }) {
   const fetcher = useFetcher();
   if (!data || data.length === 0)
@@ -109,7 +107,7 @@ export default function VisNetwork({
         window.location.href = `/editor/${treeID}/${event.nodes[0]}`;
       }
     });
-  }, [visJsRef, nodes, edges]);
+  }, [visJsRef, nodes, edges, treeID]);
 
   return (
     <>

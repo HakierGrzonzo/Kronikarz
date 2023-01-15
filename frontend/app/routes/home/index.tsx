@@ -41,7 +41,7 @@ export default function () {
         {trees.map((tree) => (
           <Card sx={{ minWidth: 400 }} key={tree.id}>
             {/* TODO: Photo of a random person from the tree? */}
-            <CardMedia sx={{ height: 200 }} image="/tree.jpg" />
+            <CardMedia sx={{ height: 500 }} image="/tree.png" />
             <CardHeader
               title={tree.name}
               action={
@@ -61,7 +61,7 @@ export default function () {
         ))}
         <Card>
           <Stack
-            sx={{ width: 200, height: "100%" }}
+            sx={{ width: 400, height: "100%" }}
             alignItems="center"
             justifyContent="center"
           >
