@@ -37,11 +37,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const dateRegex = new RegExp("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$");
 
-  const valuesResp = await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
-    treeID,
-    nodeID
-  );
-
+  const valuesResp =
+    await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
+      treeID,
+      nodeID
+    );
 
   const baseResp = await api.nodes.getOneNodeApiNodesTreeIdNodeIdGet(
     treeID,
@@ -87,21 +87,31 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (!nodeID) throw Error("nodeID not given");
   const name = data.get("base-name") as string;
   const surname = data.get("base-surname") as string;
-  const result = await api.nodes.editNodeApiNodesTreeIdNodeIdPost(treeID, nodeID, {
-    name,
-    surname,
-  });
+  const result = await api.nodes.editNodeApiNodesTreeIdNodeIdPost(
+    treeID,
+    nodeID,
+    {
+      name,
+      surname,
+    }
+  );
 
   await Promise.all(
     Object.entries(values).map(([key, value]) => {
-      api.nodes.editNodeValuesApiNodesTreeIdNodeIdFieldSetIdPost(treeID, nodeID, key, value);
+      api.nodes.editNodeValuesApiNodesTreeIdNodeIdFieldSetIdPost(
+        treeID,
+        nodeID,
+        key,
+        value
+      );
     })
   );
   return json(result);
 };
 
 export default function EditPerson() {
-  const [baseResp, data, fields] = useLoaderData<[Node, NodeValues[], FieldSetTemplate[]]>();
+  const [baseResp, data, fields] =
+    useLoaderData<[Node, NodeValues[], FieldSetTemplate[]]>();
   const allCurrentFieldSets = data.map((d) => d.out?.id);
   const [fieldSetToAdd, setFieldSetToAdd] = useState<string>("no-value");
   const [selectedFields, setFields] = useState<string[]>(allCurrentFieldSets);
@@ -112,7 +122,6 @@ export default function EditPerson() {
     setFieldSetToAdd("no-value");
   }, [selectedFields]);
   const lastPerson = useActionData();
-
 
   return (
     <Box sx={{ padding: 1, width: "100%" }}>
@@ -125,8 +134,18 @@ export default function EditPerson() {
       <Typography variant="h3">Edit person</Typography>
       <Form replace method="post">
         <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
-          <TextField name="base-name" label="Name" defaultValue={baseResp.name} required />
-          <TextField name="base-surname" label="Surname" defaultValue={baseResp.surname} required />
+          <TextField
+            name="base-name"
+            label="Name"
+            defaultValue={baseResp.name}
+            required
+          />
+          <TextField
+            name="base-surname"
+            label="Surname"
+            defaultValue={baseResp.surname}
+            required
+          />
         </Stack>
         {selectedFields
           .map((fieldSetId) => fields.find((f) => f.id === fieldSetId))
@@ -167,11 +186,7 @@ export default function EditPerson() {
                 </Accordion>
               )
           )}
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ marginTop: 1 }}
-        >
+        <Button type="submit" variant="contained" sx={{ marginTop: 1 }}>
           Save changes
         </Button>
       </Form>
