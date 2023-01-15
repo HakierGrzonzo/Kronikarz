@@ -9,6 +9,8 @@ import type { FieldSetTemplate, InputProps, NodeValues } from "~/client";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 
+const dateRegex = new RegExp("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$");
+
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
   if (!token) {
@@ -69,7 +71,7 @@ export default function PeopleView() {
           value.flatMap((nodeValue) => {
             return nodeValue.values.map((v, index) => [
               `${nodeValue.out.id}-${index}`,
-              v,
+              dateRegex.test(v.toString()) ? v.toString().split("T")[0] : v,
             ]);
           })
         ),
