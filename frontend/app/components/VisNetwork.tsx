@@ -15,6 +15,21 @@ export default function VisNetwork({
   data: AllNode[];
   treeID: string;
 }) {
+
+  const dateShower = (startDate: string, endDate: string) => {
+    startDate = startDate.split("T")[0];
+    endDate = endDate.split("T")[0];
+    if (startDate !== "" && endDate !== "") {
+      return `start date: ${startDate} end date: ${endDate}`;
+    } else if (startDate !== "") {
+      return `start date: ${startDate}`;
+    } else if (endDate !== "") {
+      return `end date: ${endDate}`;
+    } else {
+      return undefined;
+    }
+  }
+
   if (!data || data.length === 0)
     return (
       <Box
@@ -47,6 +62,8 @@ export default function VisNetwork({
         from: node.node.id,
         to: relation.out.id,
         label: relation.relation_type,
+        arrows: relation.relation_type === "małżeństwo" ? undefined : "to",
+        title: dateShower(relation.props.start_date, relation.props.end_date)
       };
     });
   });
@@ -67,8 +84,12 @@ export default function VisNetwork({
           autoResize: true,
           edges: {
             color: "#111",
+            length: 150,
           },
           interaction: { hover: true },
+          layout: {
+            improvedLayout: true,
+          },
           manipulation: {
             enabled: true,
             addNode: false,
