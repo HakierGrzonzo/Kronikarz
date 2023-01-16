@@ -16,6 +16,7 @@ RUN npm install
 ENV NODE_ENV=production
 RUN mkdir app 
 COPY --from=openapi /backend/openapi.json .
+COPY ./frontend/openapiRequest.ts ./
 RUN npm run openprod
 COPY ./frontend ./
 RUN npm run build
