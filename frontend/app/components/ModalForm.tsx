@@ -34,9 +34,9 @@ export default function ModalForm({
   const handleSubmit = (e: any) => {
     e.preventDefault();
     const label = e.target.label.value;
-    console.log(e);
     const startDate = e.target["start-date"].value;
     const endDate = e.target["end-date"].value;
+    const color = e.target.color.value;
     fetcher.submit(
       {
         treeID,
@@ -45,6 +45,7 @@ export default function ModalForm({
         label,
         startDate,
         endDate,
+        color,
         type: "addEdge",
       },
       { method: "post", replace: true }
@@ -64,17 +65,13 @@ export default function ModalForm({
           Add relation
         </Typography>
         <form onSubmit={handleSubmit}>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Start date:
-          </Typography>
+          <Typography sx={{ mt: 2 }}>Start date:</Typography>
           <TextField key="start-date" type="date" name="start-date" />
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            End date:
-          </Typography>
+          <Typography sx={{ mt: 2 }}>End date:</Typography>
           <TextField key="end-date" type="date" name="end-date" />
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Label:
-          </Typography>
+          <Typography sx={{ mt: 2 }}>Choose color:</Typography>
+          <input type="color" id="color" name="color" />
+          <Typography sx={{ mt: 2 }}>Label:</Typography>
           <input type="text" name="label" placeholder="Label" />
           <br />
           <button type="submit">Save</button>

@@ -63,6 +63,9 @@ export default function VisNetwork({
         label: relation.relation_type,
         arrows: relation.relation_type === "małżeństwo" ? undefined : "to",
         title: dateShower(relation.props.start_date, relation.props.end_date),
+        color: {
+          color: relation.props?.color || "#111",
+        },
       };
     });
   });
@@ -82,7 +85,7 @@ export default function VisNetwork({
         {
           autoResize: true,
           edges: {
-            color: "#111",
+            width: 2,
             length: 150,
           },
           interaction: { hover: true },

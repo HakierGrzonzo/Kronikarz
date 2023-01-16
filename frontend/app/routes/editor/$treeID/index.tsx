@@ -45,6 +45,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     const label = data.get("label") as string;
     const startDate = data.get("startDate") as string;
     const endDate = data.get("endDate") as string;
+    const color = data.get("color") as string;
     if (!treeID) throw Error("treeID not given");
     if (!from) throw Error("from not given");
     if (!to) throw Error("to not given");
@@ -56,6 +57,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       {
         start_date: startDate,
         end_date: endDate,
+        color: color,
       }
     );
     return "success";
