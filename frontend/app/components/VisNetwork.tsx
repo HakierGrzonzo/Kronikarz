@@ -112,15 +112,14 @@ export default function VisNetwork({
             },
             deleteEdge: function (data: any, callback: any) {
               setCurrent(data);
+              const edge = edges.find((edge) => edge.id === data.edges[0]);
               console.log(data);
-              // find in edges data.edges[0]
-              console.log(edges.find((edge) => edge.id === data.edges[0]));
-              callback(data);
-              // TODO: when backend is ready connect this
-              // fetcher.submit(
-              //   { treeID, nodeID: data.nodes[0], type: "deleteEdge" },
-              //   { method: "post", replace: true }
-              // );
+              if (!edge) return;
+              fetcher.submit(
+                { treeID, relationID: edge.id, type: "deleteEdge" },
+                { method: "post", replace: true }
+              );
+              callback(edge);
             },
           },
         }

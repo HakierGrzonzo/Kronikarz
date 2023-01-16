@@ -11,13 +11,21 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PolylineIcon from "@mui/icons-material/Polyline";
 import type { LoaderFunction } from "@remix-run/node";
 import { redirect, json } from "@remix-run/node";
-import { useLoaderData, Link, Outlet, useMatches } from "@remix-run/react";
+import {
+  useLoaderData,
+  Link,
+  Outlet,
+  useMatches,
+  useNavigate,
+  useParams,
+} from "@remix-run/react";
 import AppBarRight from "~/components/AppBarRight";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { PlaylistAdd, Reorder } from "@mui/icons-material";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import jsPDF from "jspdf";
+import { useEffect, useState } from "react";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -28,11 +36,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const { treeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
   const user = await api.users.usersCurrentUserApiUsersMeGet();
-  const data =
-    await api.nodes.getAllValuesAndRelationsInTreeApiNodesTreeIdValuesGet(
-      treeID
-    );
-  return json([user, data]);
+  return json(user);
 };
 
 const pages = {
@@ -44,27 +48,14 @@ const pages = {
 };
 
 export default function Editor() {
-  let displayExport = false;
-  if (typeof window !== "undefined") {
-    if (
-      window?.location?.pathname?.split("/")[1] === "editor" &&
-      window?.location?.pathname?.split("/")[3] === undefined
-    ) {
-      displayExport = true;
-    }
-  }
-
-  const exportDataAsJson = (data: any) => {
-    const json = JSON.stringify(data);
-    const blob = new Blob([json], { type: "application/json" });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = "data.json";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const [showLinks, setLinks] = useState<boolean>(false);
+  const matches = useMatches();
+  const currentPageID =
+    (matches.find((match) => !!pages[match.handle as unknown as string])
+      ?.handle as unknown as string) || "";
+  useEffect(() => {
+    setLinks(currentPageID === "Tree View");
+  }, [currentPageID]);
 
   const exportDataAsImg = () => {
     if (document !== undefined) {
@@ -112,11 +103,8 @@ export default function Editor() {
     }
   };
 
-  const [user, data] = useLoaderData();
-  const matches = useMatches();
-  const currentPageID =
-    matches.find((match) => !!pages[match.handle as unknown as string])
-      ?.handle || "";
+  const user = useLoaderData();
+  const { treeID } = useParams();
   return (
     <>
       <AppBar sx={{ position: "static" }}>
@@ -139,25 +127,27 @@ export default function Editor() {
                 </Link>
               ))}
               <Tooltip title="Export as json">
-                <IconButton onClick={() => exportDataAsJson(data)}>
-                  <GetAppIcon />
-                </IconButton>
+                <Link to={`/exportJson?treeID=${treeID}`}>
+                  <IconButton>
+                    <GetAppIcon />
+                  </IconButton>
+                </Link>
               </Tooltip>
-              {displayExport && (
+              {showLinks && (
                 <Tooltip title="Export as img">
                   <IconButton onClick={exportDataAsImg}>
                     <GetAppIcon />
                   </IconButton>
                 </Tooltip>
               )}
-              {displayExport && (
+              {showLinks && (
                 <Tooltip title="Export as pdf">
                   <IconButton onClick={exportDataAsPDF}>
                     <GetAppIcon />
                   </IconButton>
                 </Tooltip>
               )}
-              {displayExport && (
+              {showLinks && (
                 <Tooltip title="Export as html">
                   <IconButton onClick={exportDataAsHTML}>
                     <GetAppIcon />

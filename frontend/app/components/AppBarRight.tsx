@@ -12,7 +12,7 @@ export default function AppBarRight(props: { userID: string }) {
           <HomeIcon />
         </IconButton>
       </Link>
-      <Link to="/login">
+      <Link to="/logout">
         <IconButton>
           <MeetingRoomIcon />
         </IconButton>

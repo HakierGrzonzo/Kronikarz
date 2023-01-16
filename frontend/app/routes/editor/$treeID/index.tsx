@@ -62,17 +62,17 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
     return "success";
   }
-  // TODO: implement when backend is ready
-  // if (data.get("type") === "deleteEdge") {
-  //   const treeID = data.get("treeID") as string;
-  //   const from = data.get("from") as string;
-  //   const to = data.get("to") as string;
-  //   if (!treeID) throw Error("treeID not given");
-  //   if (!from) throw Error("from not given");
-  //   if (!to) throw Error("to not given");
-  //   await api.nodes.de(treeID, from, to);
-  //   return "success";
-  // }
+  if (data.get("type") === "deleteEdge") {
+    const treeID = data.get("treeID") as string;
+    const relationID = data.get("relationID") as string;
+    if (!treeID) throw Error("treeID not given");
+    if (!relationID) throw Error("relationID not given");
+    await api.nodes.deleteRelationApiNodesRelationTreeIdRelationIdDeletePost(
+      treeID,
+      relationID
+    );
+    return "success";
+  }
 };
 
 export default function TreeView() {

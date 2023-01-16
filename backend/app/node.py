@@ -107,13 +107,9 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         return await session.Node.select_related(node_id, NodeRelation)
 
-    @router.delete(
-        "/relation/{tree_id}/{in_node_id}/{out_node_id}/{relation_id}"
-    )
+    @router.post("/relation/{tree_id}/{relation_id}/delete")
     async def delete_relation(
         tree_id: str,
-        in_node_id: str,
-        out_node_id: str,
         relation_id: str,
         session: Session = Depends(get_db),
         current_user: UserRead = Depends(fastapi_users.current_user()),
@@ -122,16 +118,12 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         if tree_id not in current_user.trees:
             raise HTTPException(403)
 
-        node = await session.Node.select_id(in_node_id)
+        tree = await session.Tree.select_id(tree_id)
 
-        if relation_id not in node.relations:
-            raise HTTPException(
-                400, "Relation does not belong to the given node!"
-            )
+        relation = await session.NodeRelation.select_id(relation_id)
 
-        await session.Node.patch(
-            in_node_id, relations=[*node.relations, relation_id]
-        )
+        if relation.out not in tree.nodes or relation.in_ not in tree.nodes:
+            raise HTTPException(403)
 
         await session.NodeRelation.delete(relation_id)
 
