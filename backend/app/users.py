@@ -54,9 +54,13 @@ class SurrealUsersDatabase(BaseUserDatabase[User, str]):
         base_field_set = await self._session.FieldSetTemplate.create(
             name="Base Set",
             fields=[
-                InputProps(name="name", type="text", required=True),
-                InputProps(name="surname", type="text", required=False),
-                InputProps(name="birth-day", type="date", required=False),
+                InputProps(name="job", type="text", required=False),
+                InputProps(name="position", type="text", required=False),
+                InputProps(
+                    name="work-experience-years", type="number", required=False
+                ),
+                InputProps(name="birth-day", type="date", required=True),
+                InputProps(name="second-name", type="text", required=False),
                 InputProps(name="death-day", type="date", required=False),
             ],
         )
