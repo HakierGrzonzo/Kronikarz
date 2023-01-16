@@ -1,12 +1,15 @@
 import { Box } from "@mui/material";
-import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
-
-import { LoaderFunction, redirect, json } from "@remix-run/node";
+import type { GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Node } from "src/client";
-import { FieldSetTemplate, InputProps, NodeValues } from "~/client";
+import type { Node } from "src/client";
+import type { FieldSetTemplate, InputProps, NodeValues } from "~/client";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
+
+const dateRegex = new RegExp("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$");
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const token = getCookie(request, "token");
@@ -33,6 +36,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json({ fields, values });
 };
 
+const base_columns: GridColDef[] = [
+  {
+    field: "name",
+  },
+  {
+    field: "surname",
+  },
+];
+
 export default function PeopleView() {
   const { fields, values } = useLoaderData();
   const gridColumns: GridColDef[] = fields
@@ -46,17 +58,20 @@ export default function PeopleView() {
     .map((field: InputProps & { set: FieldSetTemplate; index: number }) => ({
       field: `${field.set.id}-${field.index}`,
       headerName: field.name,
+      width: 150,
     }));
   const gridRows: GridRowsProp = values.map(
     (nodeAndValues: { node: Node; value: NodeValues[] }) => {
       const { node, value } = nodeAndValues;
       return {
         id: node.id,
+        name: node.name,
+        surname: node.surname,
         ...Object.fromEntries(
           value.flatMap((nodeValue) => {
             return nodeValue.values.map((v, index) => [
               `${nodeValue.out.id}-${index}`,
-              v,
+              dateRegex.test(v.toString()) ? v.toString().split("T")[0] : v,
             ]);
           })
         ),
@@ -76,7 +91,7 @@ export default function PeopleView() {
         experimentalFeatures={{ columnGrouping: true }}
         columnGroupingModel={columnGrouping}
         rows={gridRows}
-        columns={gridColumns}
+        columns={[...base_columns, ...gridColumns]}
       />
     </Box>
   );

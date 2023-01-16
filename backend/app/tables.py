@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
@@ -16,8 +16,14 @@ class FieldSetTemplate(BaseModel):
     fields: List[InputProps]
 
 
+class RawNode(BaseModel):
+    name: str
+    surname: str
+    cover_photo: Optional[FileID]
+
+
 @base.table
-class Node(BaseModel):
+class Node(RawNode):
     files: List[FileID]
 
 
@@ -52,3 +58,9 @@ class User(BaseModel):
     is_superuser: bool = False
     is_verified: bool = True
     trees: RelationList[Tree]
+
+
+class AllNode(BaseModel):
+    node: Node
+    values: List[NodeValues]
+    relations: List[NodeRelation]

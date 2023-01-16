@@ -21,7 +21,7 @@ import { redirect, json } from "@remix-run/node";
 import { createApiClient } from "~/createApiClient";
 import { getCookie } from "~/utils/cookieUtils";
 import { useEffect, useState } from "react";
-import type { FieldSetTemplate, RawNodeValues } from "~/client";
+import type { FieldSetTemplate, NodeValues, RawNodeValues } from "~/client";
 import { Delete, ExpandMore } from "@mui/icons-material";
 import Feedback from "~/components/Feedback";
 
@@ -31,10 +31,39 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  const { treeID } = params;
+  const { treeID, nodeID } = params;
   if (treeID === undefined) throw Error("treeID not given");
+  if (nodeID === undefined) throw Error("nodeID not given");
+
+  const dateRegex = new RegExp("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$");
+
+  const valuesResp =
+    await api.nodes.getValuesForNodeApiNodesValuesTreeIdNodeIdGet(
+      treeID,
+      nodeID
+    );
+
+  const baseResp = await api.nodes.getOneNodeApiNodesTreeIdNodeIdGet(
+    treeID,
+    nodeID
+  );
+
+  const data = valuesResp.map((node) => {
+    return {
+      values: node.values.map((value) => {
+        if (dateRegex.test(value)) {
+          return value.toString().split("T")[0];
+        }
+        return value;
+      }),
+      in: node.in,
+      out: node.out,
+      id: node.id,
+    };
+  });
+
   const fields = await api.fields.getMyFieldsetsApiFieldsMyGet();
-  return json(fields);
+  return json([baseResp, data, fields]);
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -53,23 +82,41 @@ export const action: ActionFunction = async ({ request, params }) => {
     throw redirect("/login");
   }
   const api = createApiClient(token);
-  const { treeID } = params;
-  if (treeID === undefined) throw Error("treeID not given");
+  const { treeID, nodeID } = params;
+  if (!treeID) throw Error("treeID not given");
+  if (!nodeID) throw Error("nodeID not given");
   const name = data.get("base-name") as string;
   const surname = data.get("base-surname") as string;
-  const result = await api.nodes.createNewNodeApiNodesNewTreeIdPost(
+  const result = await api.nodes.editNodeApiNodesTreeIdNodeIdPost(
     treeID,
-    name,
-    surname,
-    values
+    nodeID,
+    {
+      name,
+      surname,
+    }
+  );
+
+  await Promise.all(
+    Object.entries(values).map(([key, value]) => {
+      api.nodes.editNodeValuesApiNodesTreeIdNodeIdFieldSetIdPost(
+        treeID,
+        nodeID,
+        key,
+        value
+      );
+    })
   );
   return json(result);
 };
 
-export default function AddNewPerson() {
-  const fields = useLoaderData() as FieldSetTemplate[];
+export default function EditPerson() {
+  const [baseResp, data, fields] =
+    useLoaderData<[Node, NodeValues[], FieldSetTemplate[]]>();
+  const allCurrentFieldSets = data.map((d) => d.out?.id);
   const [fieldSetToAdd, setFieldSetToAdd] = useState<string>("no-value");
-  const [selectedFields, setFields] = useState<string[]>([]);
+  const [selectedFields, setFields] = useState<string[]>(allCurrentFieldSets);
+  const getCurrentValuesForFieldSet = (fieldSetId: string) =>
+    data.find((d) => d.out?.id === fieldSetId)?.values;
   useEffect(() => {
     // When the selectedFields changes, we reset the select
     setFieldSetToAdd("no-value");
@@ -84,11 +131,21 @@ export default function AddNewPerson() {
           severity="success"
         />
       )}
-      <Typography variant="h3">Add a new person</Typography>
-      <Form reloadDocument method="post">
+      <Typography variant="h3">Edit person</Typography>
+      <Form replace method="post">
         <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
-          <TextField name="base-name" label="Name" required />
-          <TextField name="base-surname" label="Surname" required />
+          <TextField
+            name="base-name"
+            label="Name"
+            defaultValue={baseResp.name}
+            required
+          />
+          <TextField
+            name="base-surname"
+            label="Surname"
+            defaultValue={baseResp.surname}
+            required
+          />
         </Stack>
         {selectedFields
           .map((fieldSetId) => fields.find((f) => f.id === fieldSetId))
@@ -119,6 +176,9 @@ export default function AddNewPerson() {
                           type={field.type}
                           name={`${fieldSet.id}-${index}`}
                           required={field.required}
+                          defaultValue={
+                            getCurrentValuesForFieldSet(fieldSet.id)?.[index]
+                          }
                         />
                       ))}
                     </Stack>
@@ -127,7 +187,7 @@ export default function AddNewPerson() {
               )
           )}
         <Button type="submit" variant="contained" sx={{ marginTop: 1 }}>
-          Add new person
+          Save changes
         </Button>
       </Form>
       <Divider sx={{ marginBlock: 2, width: "100%" }} />
@@ -164,5 +224,3 @@ export default function AddNewPerson() {
     </Box>
   );
 }
-
-export const handle = "Add new Person";

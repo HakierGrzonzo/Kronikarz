@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_users import FastAPIUsers
@@ -8,7 +8,14 @@ from app.surreal_orm import get_db
 from app.users import UserRead
 
 from .surreal_orm.session import Session
-from .tables import Node, NodeRelation, NodeValues, RawNodeValues
+from .tables import (
+    AllNode,
+    Node,
+    NodeRelation,
+    NodeValues,
+    RawNode,
+    RawNodeValues,
+)
 
 
 def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
@@ -18,6 +25,8 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
     async def create_new_node(
         tree_id: str,
         node_values: Dict[str, RawNodeValues],
+        name: str,
+        surname: Optional[str],
         session: Session = Depends(get_db),
         current_user: UserRead = Depends(fastapi_users.current_user()),
     ):
@@ -29,6 +38,9 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         node, tree = await asyncio.gather(
             session.Node.create(
+                name=name,
+                surname=surname,
+                cover_photo=None,
                 files=list(),
             ),
             session.Tree.select_id(tree_id),
@@ -95,6 +107,30 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
 
         return await session.Node.select_related(node_id, NodeRelation)
 
+    @router.post("/relation/{tree_id}/{relation_id}/delete")
+    async def delete_relation(
+        tree_id: str,
+        relation_id: str,
+        session: Session = Depends(get_db),
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+    ):
+
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        tree = await session.Tree.select_id(tree_id)
+
+        relation = await session.NodeRelation.select_id(relation_id)
+
+        if relation.out not in tree.nodes or relation.in_ not in tree.nodes:
+            raise HTTPException(403)
+
+        await session.NodeRelation.delete(relation_id)
+
+        await session.commit()
+
+        return {"message": "Relation deleted successfully"}
+
     @router.get("/values/{tree_id}/{node_id}", response_model=List[NodeValues])
     async def get_values_for_node(
         tree_id: str,
@@ -121,6 +157,32 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
             raise HTTPException(403)
 
         return (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
+
+    @router.get("/{tree_id}/values", response_model=List[AllNode])
+    async def get_all_values_and_relations_in_tree(
+        tree_id: str,
+        session: Session = Depends(get_db),
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+    ):
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        nodes = (await session.Tree.select_deep(tree_id, ["nodes"])).nodes
+
+        data = []
+        for node in nodes:
+            node_values = await session.Node.select_related(node.id, NodeValues)
+            node_relations = await session.Node.select_related(
+                node.id, NodeRelation
+            )
+            data.append(
+                {
+                    "node": node,
+                    "values": node_values,
+                    "relations": node_relations,
+                }
+            )
+        return data
 
     @router.get("/{tree_id}/{node_id}", response_model=Node)
     async def get_one_node(
@@ -154,17 +216,37 @@ def get_node_router(fastapi_users: FastAPIUsers) -> APIRouter:
         if node_id not in tree.nodes:
             raise HTTPException(404, "Node not found!")
         await asyncio.gather(
-            session.User.patch(
-                current_user.id,
+            session.Tree.patch(
+                tree_id,
                 nodes=[node for node in tree.nodes if node != node_id],
             ),
             session.Node.delete(node_id),
         )
 
+    @router.post("/{tree_id}/{node_id}", response_model=Node)
+    async def edit_node(
+        tree_id: str,
+        node_id: str,
+        values: RawNode,
+        current_user: UserRead = Depends(fastapi_users.current_user()),
+        session: Session = Depends(get_db),
+    ):
+        "Editing node"
+        if tree_id not in current_user.trees:
+            raise HTTPException(403)
+
+        tree = await session.Tree.select_id(tree_id)
+        if node_id not in tree.nodes:
+            raise HTTPException(404, "Node not found!")
+
+        res = await session.Node.patch(node_id, **values.dict())
+        await session.commit()
+        return res
+
     @router.post(
         "/{tree_id}/{node_id}/{field_set_id}", response_model=NodeValues
     )
-    async def edit_node(
+    async def edit_node_values(
         tree_id: str,
         node_id: str,
         field_set_id: str,

@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -11,6 +11,16 @@ import {
 import { useContext } from "react";
 import CookieConsent from "~/components/CookieConsent";
 import StylesContext from "./styles/StylesContext";
+import styles from "./main.css";
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: "stylesheet",
+      href: styles,
+    },
+  ];
+};
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   frontend:
     ports:
@@ -11,7 +13,7 @@ services:
       - backend
 
   backend:
-    ports: 
+    ports:
       - "8000:80"
     environment:
       - "DATABASE=db:8000"
@@ -19,11 +21,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
+    depends_on:
+      - db
+      - minio
 
   db:
     ports:
       - "8001:8000"
-    image: surrealdb/surrealdb:latest
+    image: surrealdb/surrealdb:1.0.0-beta.8
     command: start --log trace --user root --pass root file:///db
     volumes:
       - "./db:/db"
