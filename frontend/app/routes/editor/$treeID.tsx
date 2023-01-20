@@ -127,7 +127,7 @@ export default function Editor() {
                 </Link>
               ))}
               <Tooltip title="Export as json">
-                <Link to={`/exportJson?treeID=${treeID}`}>
+                <Link to={`/exportJson?treeID=${treeID}`} reloadDocument>
                   <IconButton>
                     <GetAppIcon />
                   </IconButton>
